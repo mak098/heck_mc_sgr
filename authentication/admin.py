@@ -27,3 +27,4 @@ class UserAdmin(DjangoUserAdmin):
     
     filter_horizontal =('groups',)
 
+

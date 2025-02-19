@@ -5,8 +5,8 @@ from parameter.models import Filiere,AcademicYear,DocumentFolde
 class Student(models.Model):
     matricule = models.CharField(max_length=25,unique=True,verbose_name="Matricule")
     names = models.CharField(max_length=100, verbose_name="Noms")
-    date_of_birth = models.CharField(max_length=25,verbose_name="Date de naissance")
-    place_of_birth = models.CharField(max_length=25,verbose_name="Lieu de naissance")
+    # date_of_birth = models.CharField(max_length=25,verbose_name="Date de naissance")
+    date_and_place_of_birth = models.CharField(max_length=100,verbose_name="Lieu de naissance")
     gender = models.CharField(
         max_length=10,
         default="Masculin",
@@ -47,8 +47,8 @@ class Student(models.Model):
         return f"{self.matricule} {self.names}"
 
     class Meta:
-        verbose_name = "Etudiants"
-        verbose_name_plural = "Etudiant"
+        verbose_name = "Etudiant"
+        verbose_name_plural = "Etudiants"
         db_table = "students"
 
 class AttachementFile(models.Model):
@@ -70,6 +70,6 @@ class AttachementFile(models.Model):
         return f"{self.name}"
 
     class Meta:
-        verbose_name = "Attachemnts"
-        verbose_name_plural = "Attachement"
+        verbose_name = "Attachement"
+        verbose_name_plural = "Attachements"
         db_table = "attachements"

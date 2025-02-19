@@ -24,8 +24,7 @@ CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 
 # Application definition
 
-INSTALLED_APPS = [
-    "admin_tools_stats",  # this must be BEFORE 'admin_tools' and 'django.contrib.admin'
+INSTALLED_APPS = [   
     "django_nvd3",
     "admin_interface",
     "colorfield",
@@ -43,8 +42,9 @@ INSTALLED_APPS = [
     "corsheaders",
     "import_export",
     "rangefilter",
-   
     "authentication",
+    "parameter",
+    "student"
 ]
 
 # chart conf

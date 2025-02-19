@@ -19,8 +19,8 @@ class AcademicYear(models.Model):
         return f"{self.year}"
 
     class Meta:
-        verbose_name = "Années Academique"
-        verbose_name_plural = "Année Academique"
+        verbose_name = "Année Academique"
+        verbose_name_plural = "Années Academique"
         db_table = "academic_year"
 
 class Filiere(models.Model):
@@ -41,8 +41,8 @@ class Filiere(models.Model):
         return f"{self.name}"
 
     class Meta:
-        verbose_name = "Orientations"
-        verbose_name_plural = "Orientation"
+        verbose_name = "Orientation"
+        verbose_name_plural = "Orientations"
         db_table = "filieres"
 
 class DocumentFolde(models.Model):
@@ -62,6 +62,6 @@ class DocumentFolde(models.Model):
         return f"{self.name}"
 
     class Meta:
-        verbose_name = "Elements du dossier"
-        verbose_name_plural = "Element du dossier"
+        verbose_name = "Element du dossier"
+        verbose_name_plural = "Elements du dossier"
         db_table = "documents_folde"
