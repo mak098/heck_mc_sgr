@@ -1,0 +1,96 @@
+{% comment %} header filier coutnt {% endcomment %}
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="statistics-details d-flex align-items-center justify-content-between">
+            {% for filiere in filieres %}
+                <div>
+                    <p class="statistics-title">{{ filiere.name }}</p>
+                    <h3 class="rate-percentage  text-center">{{ filiere.student_count }}</h3>
+                    <p class="text-success text-center "><span>{{ filiere.percentage|floatformat:2 }}%</span></p>
+                </div>
+            {% empty %}
+          
+               <h3>Aucune filière disponible</h3> 
+           
+        {% endfor %}
+            
+        </div>
+    </div>
+</div>
+
+
+{% comment %} deuxieme partie {% endcomment %}
+
+<div class="row">
+  <div class="col-lg-8 d-flex flex-column">
+    <div class="row flex-grow">
+      <div class="col-12 col-lg-4 col-lg-12 grid-margin stretch-card">
+        <div class="card card-rounded">
+          <div class="card-body">
+            <div class="d-sm-flex justify-content-between align-items-start">
+              <div>
+                <h4 class="card-title card-title-dash">Statistique des inscrit par genre</h4>
+                <h5 class="card-subtitle card-subtitle-dash">Lorem Ipsum is simply dummy text of the printing</h5>
+              </div>
+              <div id="performanceLine-legend"></div>
+            </div>
+            <div class="chartjs-wrapper mt-4">
+              <canvas id="performanceLine" 
+                      data-labels='{{ labels|safe }}' 
+                      data-this-week='{{ this_week|safe }}' 
+                      data-last-week='{{ last_week|safe }}'></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4 d-flex flex-column">
+    <div class="row flex-grow">
+      <div class="col-md-6 col-lg-12 grid-margin stretch-card">
+        <div class="card bg-primary card-rounded">
+          <div class="card-body pb-0">
+            <h4 class="card-title card-title-dash text-white mb-4">Etudiants</h4>
+            <div class="row">
+              <div class="col-sm-12">
+                <p class="status-summary-ight-white mb-1">Etudiants au master complementaire</p>
+                <h2 class="text-info">{{ students }}</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-12 grid-margin stretch-card">
+        <div class="card card-rounded">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="d-flex justify-content-between align-items-center mb-2 mb-sm-0">
+                  <div class="circle-progress-width">
+                    <div id="totalVisitors" class="progressbar-js-circle pr-2"></div>
+                  </div>
+                  <div>
+                    <p class="text-small mb-2">Feminin</p>
+                    <h4 class="mb-0 fw-bold">{{ feminin }}</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="circle-progress-width">
+                    <div id="visitperday" class="progressbar-js-circle pr-2"></div>
+                  </div>
+                  <div>
+                    <p class="text-small mb-2">Masculin</p>
+                    <h4 class="mb-0 fw-bold">{{ masculin }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

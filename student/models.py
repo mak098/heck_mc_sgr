@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from parameter.models import Filiere,AcademicYear,DocumentFolde
+from parameter.models import Filiere,AcademicYear,DocumentFolde,Promotion
 
 class Student(models.Model):
     matricule = models.CharField(max_length=25,unique=True,verbose_name="Matricule")
@@ -21,10 +21,11 @@ class Student(models.Model):
         max_length=100, null=True, blank=True, verbose_name="Statut"
     )
     phone = models.CharField(
-        max_length=15, null=True, blank=True, verbose_name="TELEPHONE"
+        max_length=25, null=True, blank=True, verbose_name="TELEPHONE"
     )
     email = models.EmailField(max_length=150,null=True,blank=True,verbose_name="Email")
     orientation = models.ForeignKey(Filiere,on_delete=models.PROTECT,related_name="student_orientation_set",verbose_name="Orientation")
+    promotion = models.ForeignKey(Promotion,on_delete=models.PROTECT,null=True,related_name="student_promotion_set",verbose_name="Promotion")
     academic_year = models.ForeignKey(AcademicYear,on_delete=models.PROTECT,related_name="student_acadmic_year_set",verbose_name="Année academique")
     documents = models.ManyToManyField(
         DocumentFolde,

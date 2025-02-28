@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-scroller">
+      <div class="row p-0 m-0 proBanner" id="proBanner">
+        
+      </div>
+      <!-- partial:partials/_navbar.html -->
+      {% include "./includes/nav.html" %}
+      <!-- partial -->
+      <div class="container-fluid page-body-wrapper">
+        <!-- partial:partials/_sidebar.html -->
+        {% include "./includes/aside.html" %}
+        <!-- partial -->
+        {% include "./includes/main-panel.html" %}
+        <!-- main-panel ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+    </div>
+{% endblock content %}

@@ -161,14 +161,10 @@ LANGUAGES = (
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-# STATICFILES_DIRS = [
-#     BASE_DIR / "static",
-#     BASE_DIR / "node_modules",
-#      BASE_DIR / 'ui/static',
-# ]
+STATIC_ROOT = "static/"
+STATICFILES_DIRS = (BASE_DIR / "ui/assets",)
 STATIC_URL = "static/"
 MEDIA_URL = "/media/"
-STATIC_ROOT = "static/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 X_FRAME_OPTIONS = "ALLOWALL"

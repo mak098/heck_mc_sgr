@@ -23,6 +23,7 @@ class AcademicYear(models.Model):
         verbose_name_plural = "Années Academique"
         db_table = "academic_year"
 
+
 class Filiere(models.Model):
     name = models.CharField(max_length=256,verbose_name="Filière")
     code = models.CharField(max_length=20, null=True,blank=True,verbose_name="Code")
@@ -44,6 +45,22 @@ class Filiere(models.Model):
         verbose_name = "Orientation"
         verbose_name_plural = "Orientations"
         db_table = "filieres"
+
+
+class Promotion(models.Model):
+    name = models.CharField(
+        max_length=50, null=False, blank=False,unique=True, verbose_name="Nom"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return F"{self.name}"
+    class Meta:
+        verbose_name = "Promotion"
+        verbose_name_plural = "Promotions"
+        db_table = "promotions"
+
 
 class DocumentFolde(models.Model):
     name = models.CharField(max_length=256,verbose_name="Nom")

@@ -16,8 +16,9 @@ class StudentAdmin(ImportExportModelAdmin):
         "email",
         "orientation",
         "academic_year",
+        "promotion"
     ]
-    search_fields = list_display = [
+    search_fields =  [
         "matricule",
         "names",
         "phone",
@@ -26,8 +27,9 @@ class StudentAdmin(ImportExportModelAdmin):
     autocomplete_fields = [
         "orientation",
         "academic_year",
+        "promotion"
     ]
-    list_filter = ["gender", "orientation", "academic_year"]
+    list_filter = ["gender", "orientation","promotion", "academic_year"]
     fieldsets = (
         (
             "Identités de l'etudiant",
@@ -49,7 +51,7 @@ class StudentAdmin(ImportExportModelAdmin):
         ),
         (
             "Info Academique",
-            {"fields": (("orientation", "academic_year"),)},
+            {"fields": (("orientation","promotion", "academic_year"),)},
         ),
         (
             "Documents",
