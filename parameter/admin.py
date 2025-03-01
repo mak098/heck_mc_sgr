@@ -12,15 +12,15 @@ class AcademicYearAdmin(admin.ModelAdmin):
         obj.save()
 @admin.register(Promotion)
 class PromotionAdmin(admin.ModelAdmin):
-    list_display = ["id","name"]
-    fields = ["name"]
-    search_fields = ["name"]
+    list_display = ["id", "name", "code"]
+    fields = ["name", "code"]
+    search_fields = ["name", "code"]
 @admin.register(Filiere)
 class FiliereAdmin(admin.ModelAdmin):
-    list_display = ["id","name", "code"]
-    fields = ["name", "code"]
-    search_fields = ["name","code"]
-    
+    list_display = ["id","name","sigle", "code"]
+    fields = ["name","sigle", "code"]
+    search_fields = ["name", "sigle", "code"]
+
     def save_model(self, request, obj, form, change):
         obj.created_by = request.user
         obj.save()

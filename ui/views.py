@@ -1,7 +1,7 @@
 import json
 from django.shortcuts import render
 from django.db.models import Count
-from parameter.models import Filiere,AcademicYear
+from parameter.models import Filiere,AcademicYear,Promotion
 from student.models import Student
 from django.http import JsonResponse
 from django.template.loader import render_to_string
@@ -32,35 +32,26 @@ def index(request):
         )
 
     filieres = Filiere.objects.all()
-    labels = []
-    masculin_data = []
-    feminin_data = []
 
-    for filiere in filieres:
-        labels.append(filiere.name)
-        masculin_count = Student.objects.filter(
-            orientation=filiere, gender="Masculin"
-        ).count()
-        feminin_count = Student.objects.filter(
-            orientation=filiere, gender="Féminin"
-        ).count()
-
-        masculin_data.append(masculin_count)
-        feminin_data.append(feminin_count)
+    promotions = (
+        Promotion.objects.filter(student_promotion_set__academic_year=academic)
+        .annotate(student_count=Count("student_promotion_set"))
+        .values("id","code" ,"name", "student_count")
+    )
+    promotion_data = list(promotions)
+    
 
     return render(
         request,
         "index.html",
         {
+            "filiere_list": filieres,
             "filieres": filiere_with_student_count,
             "students": total_students,
             "academics": academic_years,
             "feminin": feminin,
             "masculin": masculin,
-            "labels": json.dumps(labels),  # ✅ Encodage JSON correct
-            "masculin_data": json.dumps(masculin_data),  # ✅
-            "feminin_data": json.dumps(feminin_data),  # ✅
-            "students": total_students,
+            "promotions": promotion_data,
         },
     )
 
@@ -89,21 +80,12 @@ def get_academic_data(request):
         )
 
     filieres = Filiere.objects.all()
-    labels = []
-    masculin_data = []
-    feminin_data = []
-
-    for filiere in filieres:
-        labels.append(filiere.name)
-        masculin_count = Student.objects.filter(
-            orientation=filiere, gender="Masculin"
-        ).count()
-        feminin_count = Student.objects.filter(
-            orientation=filiere, gender="Féminin"
-        ).count()
-
-        masculin_data.append(masculin_count)
-        feminin_data.append(feminin_count)
+    promotions = (
+        Promotion.objects.filter(student_promotion_set__academic_year=academic)
+        .annotate(student_count=Count("student_promotion_set"))
+        .values("id", "code", "name", "student_count")
+    )
+    promotion_data = list(promotions)
 
     # Retourner les données sous forme de JSON
     data = {
@@ -115,10 +97,7 @@ def get_academic_data(request):
                 "academics": academic_years,
                 "feminin": feminin,
                 "masculin": masculin,
-                "labels": json.dumps(labels),  # ✅ Encodage JSON correct
-                "masculin_data": json.dumps(masculin_data),  # ✅
-                "feminin_data": json.dumps(feminin_data),  # ✅
-                "students": total_students,
+                "promotions": promotion_data,
             },
         )
     }

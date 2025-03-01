@@ -27,6 +27,7 @@ class AcademicYear(models.Model):
 class Filiere(models.Model):
     name = models.CharField(max_length=256,verbose_name="Filière")
     code = models.CharField(max_length=20, null=True,blank=True,verbose_name="Code")
+    sigle = models.CharField(max_length=50,default="-",verbose_name="Sigle")
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
@@ -48,8 +49,16 @@ class Filiere(models.Model):
 
 
 class Promotion(models.Model):
+    code = models.CharField(
+        max_length=50,
+        default="-",
+        null=False,
+        blank=False,
+        unique=True,
+        verbose_name="code"
+    )
     name = models.CharField(
-        max_length=50, null=False, blank=False,unique=True, verbose_name="Nom"
+        max_length=150, null=False, blank=False,unique=True, verbose_name="Nom"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -30,17 +30,48 @@
           <div class="card-body">
             <div class="d-sm-flex justify-content-between align-items-start">
               <div>
-                <h4 class="card-title card-title-dash">Statistique des inscrit par genre</h4>
+                <h4 class="card-title card-title-dash">Statistique des inscrit par promotion</h4>
                 <h5 class="card-subtitle card-subtitle-dash">Lorem Ipsum is simply dummy text of the printing</h5>
               </div>
               <div id="performanceLine-legend"></div>
             </div>
-            <div class="chartjs-wrapper mt-4">
-              <canvas id="performanceLine" 
-                      data-labels='{{ labels|safe }}' 
-                      data-this-week='{{ this_week|safe }}' 
-                      data-last-week='{{ last_week|safe }}'></canvas>
-            </div>
+            <div class="card-body">
+                    <div class="table-responsive">
+                      <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <th> code </th>
+                            <th> promotion </th>
+                            <th> Progress </th>
+                            <th> Nombre</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for promotion in promotions %}
+                          <tr>
+                            <td class="py-1">
+                              {{ promotion.code }}
+                            </td>
+                            <td> {{ promotion.name }} </td>
+                            <td>
+                              <div class="progress">
+    <div class="progress-bar bg-success" role="progressbar"
+         style="width: 0%" 
+         data-student-count="{{ promotion.student_count }}"
+         data-total-students="{{ students }}"
+         aria-valuemin="0" aria-valuemax="100">
+    </div>
+</div>
+                            </td>
+                            <td> {{ promotion.student_count }}</td>
+                            
+                          </tr>
+                        {% endfor %}
+                         
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
           </div>
         </div>
       </div>
@@ -94,3 +125,16 @@
     </div>
   </div>
 </div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const progressBar = document.querySelector('.progress-bar');
+        const studentCount = parseInt(progressBar.getAttribute('data-student-count'));
+        const totalStudents = parseInt(progressBar.getAttribute('data-total-students'));
+        const percentage = (studentCount / totalStudents) * 100;
+
+        progressBar.style.width = percentage + "%";
+        progressBar.setAttribute("aria-valuenow", percentage);
+    });
+</script>
