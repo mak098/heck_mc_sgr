@@ -5,5 +5,10 @@ urlpatterns = [
     path("", views.index, name="dash"),
     path("tab-dash/", views.get_academic_data, name="tab-dash"),
     path("login", views.login_page, name="login-page"),
-    path("students_by_filiere/<str:sigle>", orientationFiliere.get_students, name="filiere-students"),
+    path("signout", views.logout_view, name="signout"),
+    path(
+        "students_by_filiere/<str:sigle>",
+        orientationFiliere.get_students,
+        name="filiere-students",
+    ),
 ]
