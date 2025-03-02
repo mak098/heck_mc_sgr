@@ -1,28 +1,4 @@
-{% comment %} header filier coutnt {% endcomment %}
 
-<div class="row">
-  <div class="col-sm-12">
-    <div
-      class="statistics-details d-flex align-items-center justify-content-between"
-    >
-      {% for filiere in filieres %}
-      <div>
-        <p class="statistics-title">{{ filiere.name }}</p>
-        <h3 class="rate-percentage text-center">{{ filiere.student_count }}</h3>
-        <p class="text-success text-center">
-          <span>{{ filiere.percentage|floatformat:2 }}%</span>
-        </p>
-      </div>
-      {% empty %}
-
-      <h3>Aucune filière disponible</h3>
-
-      {% endfor %}
-    </div>
-  </div>
-</div>
-
-{% comment %} deuxieme partie {% endcomment %}
 
 <div class="row">
   <div class="col-lg-8 d-flex flex-column">
@@ -46,31 +22,19 @@
                 <table class="table table-striped">
                   <thead>
                     <tr>
-                      <th>code</th>
-                      <th>promotion</th>
-                      <th>Progress</th>
-                      <th>Nombre</th>
+                      <th>Matricule</th>
+                      <th>Noms</th>
+                      <th>Genre</th>
+                      <th>Date et lieu de naissance</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for promotion in promotions %}
+                    {% for student in students %}
                     <tr>
-                      <td class="py-1">{{ promotion.code }}</td>
-                      <td>{{ promotion.name }}</td>
-                      <td>
-                        <div class="progress">
-                          <div
-                            class="progress-bar bg-success"
-                            role="progressbar"
-                            style="width: 0%"
-                            data-student-count="{{ promotion.student_count }}"
-                            data-total-students="{{ students }}"
-                            aria-valuemin="0"
-                            aria-valuemax="100"
-                          ></div>
-                        </div>
-                      </td>
-                      <td>{{ promotion.student_count }}</td>
+                      <td class="py-1">{{ student.matricule }}</td>
+                      <td>{{ student.names }}</td>
+                      <td>{{ student.gender}}</td>
+                      <td>{{ student.date_and_place_of_birth }}</td>
                     </tr>
                     {% endfor %}
                   </tbody>
@@ -142,19 +106,3 @@
     </div>
   </div>
 </div>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const progressBar = document.querySelector(".progress-bar");
-    const studentCount = parseInt(
-      progressBar.getAttribute("data-student-count")
-    );
-    const totalStudents = parseInt(
-      progressBar.getAttribute("data-total-students")
-    );
-    const percentage = (studentCount / totalStudents) * 100;
-
-    progressBar.style.width = percentage + "%";
-    progressBar.setAttribute("aria-valuenow", percentage);
-  });
-</script>

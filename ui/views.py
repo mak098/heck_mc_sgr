@@ -2,9 +2,15 @@ import json
 from django.shortcuts import render
 from django.db.models import Count
 from parameter.models import Filiere,AcademicYear,Promotion
+from authentication.models import User
 from student.models import Student
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_list_or_404
+from .forms import SigninForm
 
 
 def index(request):
@@ -43,7 +49,7 @@ def index(request):
 
     return render(
         request,
-        "index.html",
+        "pages/dash.html",
         {
             "filiere_list": filieres,
             "filieres": filiere_with_student_count,
@@ -54,6 +60,29 @@ def index(request):
             "promotions": promotion_data,
         },
     )
+
+def login_page(request):
+    error = False
+    if request.user.is_authenticated:
+        return redirect('dash')
+    else:
+        form = SigninForm(request.POST or None)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('dash')
+            else:
+                error = True
+    return render(request, "pages/login.html", locals())
+
+
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect("dash")
 
 
 def get_academic_data(request):

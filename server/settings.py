@@ -82,7 +82,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "server.wsgi.application"
 
-if IS_PRODUCTION:
+if not IS_PRODUCTION:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
