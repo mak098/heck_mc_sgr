@@ -11,6 +11,8 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_list_or_404
 from .forms import SigninForm
+from rest_framework.response import Response
+from rest_framework import viewsets,status
 
 
 def index(request):
@@ -131,3 +133,12 @@ def get_academic_data(request):
         )
     }
     return JsonResponse(data)
+
+def update_promotion(request,promotion):
+    pro = Promotion.objects.get(id=promotion)
+    students = Student.objects.all()
+    for student in students :
+        student.promotion =pro
+        student.save()
+    
+    return Response({"message":"update success"},status=status.HTTP_200_OK)
