@@ -1,5 +1,9 @@
 from django.contrib import admin
-from .models import AcademicYear,Filiere,DocumentFolde,Promotion
+from .models import AcademicYear,Filiere,DocumentFolde,Promotion, Firm
+@admin.register(Firm)
+class FirmAdmin(admin.ModelAdmin):
+    pass
+
 
 @admin.register(AcademicYear)
 class AcademicYearAdmin(admin.ModelAdmin):

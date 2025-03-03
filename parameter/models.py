@@ -1,6 +1,25 @@
 from django.db import models
 from django.conf import settings
 
+class Firm(models.Model):
+    name = models.CharField(max_length=256,verbose_name="Nom")
+    sigle = models.CharField(max_length=25,default='-',verbose_name="Sigle")
+    service = models.CharField(max_length=256, verbose_name="Service")
+    service_sigle = models.CharField(max_length=256, verbose_name="Service sigle")
+    email = models.CharField(max_length=256,verbose_name="Email")
+    phone = models.CharField(max_length=256,verbose_name="Phone")
+    logo = models.ImageField(upload_to='logo/etablissement/',verbose_name="Logo")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)     
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = "Etablissement"
+        verbose_name_plural = "Etablissement"
+        db_table = "etablishements"
+
 class AcademicYear(models.Model):
     year = models.CharField(max_length=10,unique=True,primary_key=True,verbose_name="Année")
     is_current = models.BooleanField(default=False,verbose_name="Active")
