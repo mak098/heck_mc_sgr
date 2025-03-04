@@ -8,7 +8,9 @@ class SpecialityInline(admin.TabularInline):
     fields = ["name",]
 
 @admin.register(Speciality)
-class SpecialityAdmin(admin.ModelAdmin): pass
+class SpecialityAdmin(admin.ModelAdmin): 
+
+    search_fields = ("name",)
 @admin.register(Firm)
 class FirmAdmin(admin.ModelAdmin):
     pass

@@ -12,7 +12,7 @@ def get_students(request,sigle):
     # filiere = request.get("filiere")
     filieres = Filiere.objects.all()
     academic_years = AcademicYear.objects.filter().order_by("-created_at")
-
+    promotions = Promotion.objects.all()
     filiere = Filiere.objects.get(sigle=sigle)
     academic = AcademicYear.objects.get(is_current=True)
     students = Student.objects.filter(academic_year=academic, orientation=filiere)
@@ -23,6 +23,7 @@ def get_students(request,sigle):
         {
             "students": students,
             "filieres":filieres,
+            "promotions":promotions,
             "academics":academic_years
         },
     )

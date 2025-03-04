@@ -52,7 +52,8 @@
               <p>Contenu spécifique pour {{ academic.year }}</p>
 
               <div id="content-{{ academic.year|slugify }}">
-                {% include "pages/orientantions/filiere-main-panel.html" %} 
+                {% comment %} {% include "pages/orientantions/filiere-main-panel.html" %}  {% endcomment %}
+                {% include "pages/orientantions/filiere-main-panel-copy.html" %} 
 
               </div>
             </div>

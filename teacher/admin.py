@@ -6,10 +6,12 @@ class TeacherSpecialityInline(admin.TabularInline):
     extra = 0
     model = TeacherSpeciality
     fields = ("speciality",)
+    autocomplete_fields = ("speciality",)
 @admin.register(TeacherSpeciality)
 class TeacherSpecialityAdmin(admin.ModelAdmin):
     list_display = ("teacher","speciality")
     fields = ("teacher","speciality")
+    search_fields = ("speciality",)
 @admin.register(Grade)
 class GradeAdmin(admin.ModelAdmin):
     list_display = ["title", "number_of_hours"]
