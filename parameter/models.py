@@ -66,7 +66,16 @@ class Filiere(models.Model):
         verbose_name_plural = "Orientations"
         db_table = "filieres"
 
+class Speciality(models.Model):
+    name = models.CharField(max_length=300,verbose_name="nom")
+    orientation = models.ForeignKey(Filiere,on_delete=models.PROTECT,related_name="specialities_filiere_set",verbose_name="Orientation")
+    def __str__(self):
+        return f"{self.name}"
 
+    class Meta:
+        verbose_name = "Specialité"
+        verbose_name_plural = "Specialités"
+        db_table = "specialities"
 class Promotion(models.Model):
     code = models.CharField(
         max_length=50,

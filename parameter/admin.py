@@ -1,5 +1,14 @@
 from django.contrib import admin
-from .models import AcademicYear,Filiere,DocumentFolde,Promotion, Firm
+from .models import AcademicYear, Filiere, DocumentFolde, Promotion, Firm, Speciality
+
+
+class SpecialityInline(admin.TabularInline):
+    extra = 0
+    model = Speciality
+    fields = ["name",]
+
+@admin.register(Speciality)
+class SpecialityAdmin(admin.ModelAdmin): pass
 @admin.register(Firm)
 class FirmAdmin(admin.ModelAdmin):
     pass
@@ -24,6 +33,7 @@ class FiliereAdmin(admin.ModelAdmin):
     list_display = ["id","name","sigle", "code"]
     fields = ["name","sigle", "code"]
     search_fields = ["name", "sigle", "code"]
+    inlines = [SpecialityInline,]
 
     def save_model(self, request, obj, form, change):
         obj.created_by = request.user

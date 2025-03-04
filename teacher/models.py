@@ -1,7 +1,6 @@
 from django.db import models
 from authentication.models import User
-from parameter.models import Filiere
-from parameter.models import TeacherQualification
+from parameter.models import Filiere,Speciality
 from django.conf import settings
 
 class Grade(models.Model):
@@ -31,20 +30,25 @@ class Teacher(User):
     matricule = models.CharField(
         max_length=25, unique=True, verbose_name="Matricule"
     )
-    name = models.CharField(max_length=25, null=True, blank=True, verbose_name="Nom")
-    phone = models.CharField(max_length=25, null=True, blank=True, verbose_name="Phone")
+    name = models.CharField(max_length=25, null=True, blank=True, verbose_name="Matricule")
+    phone = models.CharField(max_length=25, null=True, blank=True, verbose_name="Nom")
     type = models.CharField(
-        max_length=25, default="permanant", null=True, blank=True, verbose_name="Type"
+        max_length=25, default="permanant",choices=(
+            ("permanent","Permenant"),
+            ("visiteur","visiteuu")
+        ), null=True, blank=True, verbose_name="Type"
     )
-    filiere = models.ForeignKey(
+    orientation = models.ForeignKey(
         Filiere,
+        null=True,blank=True,
         on_delete=models.PROTECT,
-        related_name="section_set",
-        verbose_name="Section",
+        related_name="teacher_orientation_set_set",
+        verbose_name="Orientation",
     )
     grade = models.ForeignKey(
-        Grade, on_delete=models.PROTECT,related_name="teacher_grade_set", verbose_name="Grade"
+        Grade, on_delete=models.PROTECT,null=True,blank=True,related_name="teacher_grade_set", verbose_name="Grade"
     )
+    specialities = models.ManyToManyField(Speciality,related_name="teacher_specialities_set",verbose_name="Specialités")
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
@@ -66,4 +70,4 @@ class Teacher(User):
     class Meta:
         verbose_name = "Enseignant"
         verbose_name_plural = "Enseignants"
-        db_table = "teacher"
+        db_table = "teachers"

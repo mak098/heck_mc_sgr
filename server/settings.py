@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     "rangefilter",
     "authentication",
     "parameter",
-    "student"
+    "student",
+    "teacher"
 ]
 
 # chart conf

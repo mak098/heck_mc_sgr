@@ -17,7 +17,7 @@
               </div>
               <div id="performanceLine-legend"></div>
             </div>
-            <div class="card-body">
+           
               <div class="table-responsive">
                 <table class="table table-striped">
                   <thead>
@@ -40,7 +40,40 @@
                   </tbody>
                 </table>
               </div>
+
+              <!-- Contrôles de pagination -->
+            <div class="d-flex justify-content-center mt-3">
+              <nav>
+                <ul class="pagination">
+                  {% if page_obj.has_previous %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a>
+                  </li>
+                  {% else %}
+                  <li class="page-item disabled">
+                    <span class="page-link">Précédent</span>
+                  </li>
+                  {% endif %}
+
+                  {% for num in page_obj.paginator.page_range %}
+                  <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                  </li>
+                  {% endfor %}
+
+                  {% if page_obj.has_next %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a>
+                  </li>
+                  {% else %}
+                  <li class="page-item disabled">
+                    <span class="page-link">Suivant</span>
+                  </li>
+                  {% endif %}
+                </ul>
+              </nav>
             </div>
+          
           </div>
         </div>
       </div>
@@ -59,7 +92,7 @@
                 <p class="status-summary-ight-white mb-1">
                   Etudiants au master complementaire
                 </p>
-                <h2 class="text-info">{{ students }}</h2>
+                <h2 class="text-info">ICI LES ACTIONS</h2>
               </div>
             </div>
           </div>
