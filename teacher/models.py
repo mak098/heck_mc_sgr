@@ -48,7 +48,6 @@ class Teacher(User):
     grade = models.ForeignKey(
         Grade, on_delete=models.PROTECT,null=True,blank=True,related_name="teacher_grade_set", verbose_name="Grade"
     )
-    specialities = models.ManyToManyField(Speciality,related_name="teacher_specialities_set",verbose_name="Specialités")
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
@@ -64,10 +63,21 @@ class Teacher(User):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
-    def fullname(self):
-        return f"{self.first_name} {self.last_name} {self.name}"
-
     class Meta:
         verbose_name = "Enseignant"
         verbose_name_plural = "Enseignants"
         db_table = "teachers"
+
+class TeacherSpeciality(models.Model):
+    teacher = models.ForeignKey(Teacher,on_delete=models.PROTECT,related_name="teacher_speciality_set",verbose_name="Enseignant")
+    speciality = models.ForeignKey(Speciality,on_delete=models.PROTECT,related_name="speciality_teacher_set",verbose_name="Specialité")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.teacher} {self.speciality}"
+
+    class Meta:
+        verbose_name = "Enseignant et specialité"
+        verbose_name_plural = "Enseignants et specialiés"
+        db_table = "teachers_specialities"
