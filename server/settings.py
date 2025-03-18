@@ -45,7 +45,9 @@ INSTALLED_APPS = [
     "authentication",
     "parameter",
     "student",
-    "teacher"
+    "teachers",
+    "archive",
+    "affectation"
 ]
 
 # chart conf

@@ -1,0 +1,188 @@
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+    <ul class="nav">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'dash' %}">
+          <i class="mdi mdi-grid-large menu-icon"></i>
+          <span class="menu-title">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item nav-category">Menus</li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          data-bs-toggle="collapse"
+          href="#ui-basic"
+          aria-expanded="false"
+          aria-controls="ui-basic"
+        >
+          <i class="menu-icon mdi mdi-floor-plan"></i>
+          <span class="menu-title">Orientations</span>
+          <i class="menu-arrow"></i>
+        </a>
+        <div class="collapse" id="ui-basic">
+          <ul class="nav flex-column sub-menu">
+            {% for section in sections %}
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                data-bs-toggle="collapse"
+                href="#section-{{ section.id }}"
+                aria-expanded="false"
+                aria-controls="section-{{ section.id }}"
+              >
+                {{ section.sigle }}
+                <i class="menu-arrow"></i>
+              </a>
+              <div
+                class="collapse filiere-menu"
+                id="section-{{ section.id }}"
+                data-bs-parent="#ui-basic"
+              >
+                <ul class="nav flex-column sub-menu">
+                  {% for filiere in section.filiere_section_set.all %}
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      href="{% url 'filiere-students' filiere.id %}"
+                      >{{ filiere.sigle }}</a
+                    >
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          data-bs-toggle="collapse"
+          href="#form-elements"
+          aria-expanded="false"
+          aria-controls="form-elements"
+        >
+          <i class="menu-icon mdi mdi-card-text-outline"></i>
+          <span class="menu-title">Services</span>
+          <i class="menu-arrow"></i>
+        </a>
+        <div class="collapse" id="form-elements">
+          <ul class="nav flex-column sub-menu">
+            <li class="nav-item">
+              <a class="nav-link" href="pages/forms/basic_elements.html">Stage</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="pages/forms/basic_elements.html">Labo</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="pages/forms/basic_elements.html"
+                >Bibliotheque</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="pages/forms/basic_elements.html"
+                >Edition</a
+              >
+            </li>
+          </ul>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          data-bs-toggle="collapse"
+          href="#charts"
+          aria-expanded="false"
+          aria-controls="charts"
+        >
+          <i class="menu-icon mdi mdi-chart-line"></i>
+          <span class="menu-title">Rapports</span>
+          <i class="menu-arrow"></i>
+        </a>
+        <div class="collapse" id="charts">
+          <ul class="nav flex-column sub-menu">
+            <li class="nav-item">
+              <a class="nav-link" href="pages/charts/chartjs.html">ChartJs</a>
+            </li>
+          </ul>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          data-bs-toggle="collapse"
+          href="#icons"
+          aria-expanded="false"
+          aria-controls="icons"
+        >
+          <i class="menu-icon mdi mdi-layers-outline"></i>
+          <span class="menu-title">Config</span>
+          <i class="menu-arrow"></i>
+        </a>
+        <div class="collapse" id="icons">
+          <ul class="nav flex-column sub-menu">
+            <li class="nav-item">
+              <a class="nav-link" href="pages/icons/font-awesome.html"
+                >Exercices</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="pages/icons/font-awesome.html"
+                >Orientations</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="pages/icons/font-awesome.html"
+                >Promotions</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="pages/icons/font-awesome.html"
+                >Utulisateurs</a
+              >
+            </li>
+          </ul>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="docs/documentation.html">
+          <i class="menu-icon mdi mdi-file-document"></i>
+          <span class="menu-title">TFC / P. TUTORE</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  var subMenuLinks = document.querySelectorAll('.nav-link[data-bs-toggle="collapse"]');
+
+  subMenuLinks.forEach(function(link) {
+    link.addEventListener('click', function(event) {
+      event.stopPropagation(); // Empêche la propagation de l'événement
+
+      var target = document.querySelector(link.getAttribute('href'));
+      var isCollapsed = target.classList.contains('show');
+
+      if (!isCollapsed) {
+        // Ferme tous les autres sous-menus ouverts
+        var openSubMenus = document.querySelectorAll('.collapse.show');
+        openSubMenus.forEach(function(openSubMenu) {
+          if (openSubMenu !== target) {
+            openSubMenu.classList.remove('show');
+          }
+        });
+
+        // Ouvre le sous-menu actuel
+        target.classList.add('show');
+      } else {
+        // Ferme le sous-menu actuel
+        target.classList.remove('show');
+      }
+    });
+  });
+});
+</script>
+
+
+

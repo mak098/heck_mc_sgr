@@ -1,7 +1,7 @@
 import json
 from django.shortcuts import render
 from django.db.models import Count
-from parameter.models import Filiere,AcademicYear,Promotion
+from parameter.models import Section,Filiere,AcademicYear,Promotion
 from authentication.models import User
 from student.models import Student
 from django.http import JsonResponse
@@ -13,7 +13,17 @@ from django.shortcuts import render, redirect, get_list_or_404
 from .forms import SigninForm
 from rest_framework.response import Response
 from rest_framework import viewsets,status
+from django.conf import settings
+from django.conf.urls import handler404
+from django.shortcuts import render
 
+
+def custom_404(request, exception):
+    return render(request, "pages/404.html", status=404)
+
+
+if settings.DEBUG is False:
+    handler404 = custom_404
 
 def index(request):
     current_url = request.resolver_match.view_name
@@ -40,6 +50,7 @@ def index(request):
         )
 
     filieres = Filiere.objects.all()
+    sections = Section.objects.all()
 
     promotions = (
         Promotion.objects.filter(student_promotion_set__academic_year=academic)
@@ -54,6 +65,7 @@ def index(request):
         "pages/dash.html",
         {
             "filiere_list": filieres,
+            "sections": sections,
             "filieres": filiere_with_student_count,
             "students": total_students,
             "academics": academic_years,
@@ -123,6 +135,7 @@ def get_academic_data(request):
         "html": render_to_string(
             "dash-cards/filieres-count-students.html",
             {
+                "filiere_list": filieres,
                 "filieres": filiere_with_student_count,
                 "students": total_students,
                 "academics": academic_years,

@@ -42,8 +42,19 @@ class AcademicYear(models.Model):
         verbose_name_plural = "Années Academique"
         db_table = "academic_year"
 
+class Section(models.Model):
+    sigle = models.CharField(max_length=50,unique=True,verbose_name="Sigle")
+    name = models.CharField(max_length=250, unique=True,verbose_name="Nom")
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = "Section"
+        verbose_name_plural = "Sections"
+        db_table = "sections"
 
 class Filiere(models.Model):
+    section = models.ForeignKey(Section,related_name="filiere_section_set", on_delete=models.PROTECT,null=True,verbose_name="Section")
     name = models.CharField(max_length=256,verbose_name="Filière")
     code = models.CharField(max_length=20, null=True,blank=True,verbose_name="Code")
     sigle = models.CharField(max_length=50,default="-",verbose_name="Sigle")
