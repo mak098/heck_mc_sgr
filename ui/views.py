@@ -17,7 +17,6 @@ from django.conf import settings
 from django.conf.urls import handler404
 from django.shortcuts import render
 
-
 def custom_404(request, exception):
     return render(request, "pages/404.html", status=404)
 
@@ -58,7 +57,6 @@ def index(request):
         .values("id","code" ,"name", "student_count")
     )
     promotion_data = list(promotions)
-    
 
     return render(
         request,

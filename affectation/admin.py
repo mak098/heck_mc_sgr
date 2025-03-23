@@ -11,7 +11,7 @@ class AffectionAdmin(admin.ModelAdmin):
     autocomplete_fields = [
         "teacher",
         "type",
-        "students",
+        "student",
         "academic_year",
         "affected_by",
     ]

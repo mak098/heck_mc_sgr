@@ -1,7 +1,7 @@
 import json
 from django.shortcuts import render
 from django.db.models import Count
-from parameter.models import Filiere, AcademicYear, Promotion
+from parameter.models import Section,Filiere, AcademicYear, Promotion
 from student.models import Student
 from django.http import JsonResponse
 from django.template.loader import render_to_string
@@ -25,7 +25,7 @@ def get_students(request,sigle):
     filiere = Filiere.objects.get(sigle=sigle)
     academic = AcademicYear.objects.get(is_current=True)
     students = Student.objects.filter(academic_year=academic, orientation=filiere)
-
+    sections = Section.objects.all()
     return render(
         request,
         "pages/studentsfiliere.html",
@@ -35,5 +35,6 @@ def get_students(request,sigle):
             "filieres": filiere_with_student_count,
             "promotions": promotions,
             "academics": academic_years,
+            "sections":sections
         },
     )

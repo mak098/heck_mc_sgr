@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from . import rapportPdf
 from . import orientationFiliere
+from . import affectations
 urlpatterns = [
     path("", views.index, name="dash"),
     path("tab-dash/", views.get_academic_data, name="tab-dash"),
@@ -21,5 +22,16 @@ urlpatterns = [
         "students_by_filiere/<str:sigle>",
         orientationFiliere.get_students,
         name="filiere-students",
+    ),
+    path(
+        "affectation-by-section/<str:sigle>",
+        affectations.affectation_page,
+        name="affectation-by-section",
+    ),
+    path("get-students/", affectations.get_students, name="get_students"),
+    path(
+        "get_students_by_teacher/",
+        affectations.get_students_by_teacher,
+        name="get_students_by_teacher",
     ),
 ]

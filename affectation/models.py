@@ -24,8 +24,9 @@ class Affectation(models.Model):
         verbose_name="Type",
     )    
     group_name = models.CharField(max_length=250,default="-",verbose_name="Nom du groupe")    
-    students = models.ManyToManyField(
+    student = models.ForeignKey(
         Student,
+        on_delete=models.PROTECT,
         related_name="affectations_students_set",
         verbose_name="Etudiants"
     )
