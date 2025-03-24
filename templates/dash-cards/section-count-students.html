@@ -1,0 +1,160 @@
+{% comment %} header filier coutnt {% endcomment %}
+
+<div class="row">
+  <div class="col-sm-12">
+    <div
+      class="statistics-details d-flex align-items-center justify-content-between"
+    >
+      {% for section in sections_count %}
+      <div>
+        <p class="statistics-title">{{ section.name }}</p>
+        <h3 class="rate-percentage text-success text-center">{{ section.student_count }}</h3>
+        {% comment %} <p class="text-success text-center">
+          <span>{{ section.percentage|floatformat:2 }}%</span>
+        </p> {% endcomment %}
+      </div>
+      {% empty %}
+
+      <h3>Aucune filière disponible</h3>
+
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% comment %} deuxieme partie {% endcomment %}
+
+<div class="row">
+  <div class="col-lg-8 d-flex flex-column">
+    <div class="row flex-grow">
+      <div class="col-12 col-lg-4 col-lg-12 grid-margin stretch-card">
+        <div class="card card-rounded">
+          <div class="card-body">
+            <div class="d-sm-flex justify-content-between align-items-start">
+              <div>
+                <h4 class="card-title card-title-dash">
+                  Statistique des inscrit par promotion
+                </h4>
+                <h5 class="card-subtitle card-subtitle-dash">
+                  Lorem Ipsum is simply dummy text of the printing
+                </h5>
+              </div>
+              <div id="performanceLine-legend"></div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>code</th>
+                      <th>promotion</th>
+                      <th>Progress</th>
+                      <th>Nombre</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for promotion in promotions %}
+                    <tr>
+                      <td class="py-1">{{ promotion.code }}</td>
+                      <td>{{ promotion.name }}</td>
+                      <td>
+                        <div class="progress">
+                          <div
+                            class="progress-bar bg-success"
+                            role="progressbar"
+                            style="width: 0%"
+                            data-student-count="{{ promotion.student_count }}"
+                            data-total-students="{{ students }}"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                          ></div>
+                        </div>
+                      </td>
+                      <td>{{ promotion.student_count }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4 d-flex flex-column">
+    <div class="row flex-grow">
+      <div class="col-md-6 col-lg-12 grid-margin stretch-card">
+        <div class="card bg-primary card-rounded">
+          <div class="card-body pb-0">
+            <h4 class="card-title card-title-dash text-white mb-4">
+              Etudiants
+            </h4>
+            <div class="row">
+              <div class="col-sm-12">
+                <p class="status-summary-ight-white mb-1">
+                  Etudiants au master complementaire
+                </p>
+                <h2 class="text-info">{{ students }}</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-12 grid-margin stretch-card">
+        <div class="card card-rounded">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-lg-6">
+                <div
+                  class="d-flex justify-content-between align-items-center mb-2 mb-sm-0"
+                >
+                  <div class="circle-progress-width">
+                    <div
+                      id="totalVisitors"
+                      class="progressbar-js-circle pr-2"
+                    ></div>
+                  </div>
+                  <div>
+                    <p class="text-small mb-2">Feminin</p>
+                    <h4 class="mb-0 fw-bold">{{ feminin }}</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="circle-progress-width">
+                    <div
+                      id="visitperday"
+                      class="progressbar-js-circle pr-2"
+                    ></div>
+                  </div>
+                  <div>
+                    <p class="text-small mb-2">Masculin</p>
+                    <h4 class="mb-0 fw-bold">{{ masculin }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const progressBar = document.querySelector(".progress-bar");
+    const studentCount = parseInt(
+      progressBar.getAttribute("data-student-count")
+    );
+    const totalStudents = parseInt(
+      progressBar.getAttribute("data-total-students")
+    );
+    const percentage = (studentCount / totalStudents) * 100;
+
+    progressBar.style.width = percentage + "%";
+    progressBar.setAttribute("aria-valuenow", percentage);
+  });
+</script>

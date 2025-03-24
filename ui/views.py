@@ -16,6 +16,7 @@ from rest_framework import viewsets,status
 from django.conf import settings
 from django.conf.urls import handler404
 from django.shortcuts import render
+from django.db import models
 
 def custom_404(request, exception):
     return render(request, "pages/404.html", status=404)
@@ -36,7 +37,15 @@ def index(request):
     filiere_with_student_count = Filiere.objects.filter(
         student_orientation_set__academic_year=academic  # Traversée de relation correcte
     ).annotate(student_count=Count("student_orientation_set", distinct=True))
-
+    
+    sections_with_student_counts = Section.objects.annotate(
+        student_count=Count(
+            "filiere_section_set__student_orientation_set",
+            filter=models.Q(
+                filiere_section_set__student_orientation_set__academic_year=academic
+            ),
+        )
+    )
     academic_years = AcademicYear.objects.filter().order_by("-created_at")
     # Calcul du nombre total d'étudiants
     total_students = Student.objects.filter(academic_year=academic).count()
@@ -64,6 +73,7 @@ def index(request):
         {
             "filiere_list": filieres,
             "sections": sections,
+            "sections_count": sections_with_student_counts,
             "filieres": filiere_with_student_count,
             "students": total_students,
             "academics": academic_years,
