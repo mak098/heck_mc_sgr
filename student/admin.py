@@ -29,7 +29,7 @@ class StudentAdmin(ImportExportModelAdmin):
         "academic_year",
         "promotion"
     ]
-    list_filter = ["gender", "orientation","promotion", "academic_year"]
+    list_filter = ["gender", "orientation__section", "orientation", "promotion", "academic_year"]
     fieldsets = (
         (
             "Identités de l'etudiant",
