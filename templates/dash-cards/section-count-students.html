@@ -7,7 +7,7 @@
     >
       {% for section in sections_count %}
       <div>
-        <p class="statistics-title">{{ section.name }}</p>
+        <p class="statistics-title">{{ section.sigle }}</p>
         <h3 class="rate-percentage text-success text-center">{{ section.student_count }}</h3>
         {% comment %} <p class="text-success text-center">
           <span>{{ section.percentage|floatformat:2 }}%</span>
