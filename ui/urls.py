@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from . import rapportPdf
+from . import rapportTeacherPdf
 from . import orientationFiliere
 from . import affectations
 urlpatterns = [
@@ -33,5 +34,10 @@ urlpatterns = [
         "get_students_by_teacher/",
         affectations.get_students_by_teacher,
         name="get_students_by_teacher",
+    ),
+    path(
+        "teacher-pdf/<str:year>/<str:teacher>",
+        rapportTeacherPdf.ExportPdf.getTeacherStudent,
+        name="download-teacher-pdf",
     ),
 ]
