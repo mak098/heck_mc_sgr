@@ -1,0 +1,136 @@
+<div class="row">
+  <div class="col-md-6 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Affectation</h4>
+        <form class="forms-group">
+          <div class="form-group">
+            <label>Selectionner un enseignant</label>
+            <select class="js-example-basic-single w-100 teacher-choice" >
+              {% for teacher in teachers %}
+              <option value="{{ teacher.id }}">{{teacher.full_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Liste des etudiants par enseignant</h4>
+        <div class="table-responsive">
+              <table class="table table-striped student-table">
+                <thead>
+                  <tr>
+                    <th>matricule</th>
+                    <th>noms</th>
+                    <th>promotion</th>
+                    <th>Dep</th>
+                    <th>Section</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+            </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+ $(document).ready(function () {
+  function loadStudents() {
+    var departementId = $(".departement-choice").val();
+    var promotionId = $(".promotion-choice").val();
+
+    if (departementId && promotionId) {
+      $.ajax({
+        url: "{% url 'get_students' %}",
+        type: "GET",
+        data: {
+          departement_id: departementId,
+          promotion_id: promotionId,
+        },
+        success: function (data) {
+          $(".student-choice").empty();
+          $(".student-choice").append(
+            '<option value="">Sélectionner un étudiant</option>'
+          );
+          $.each(data.students, function (key, student) {
+            $(".student-choice").append(
+              '<option value="' + student.id + '">' + student.names + "</option>"
+            );
+          });
+        },
+        error: function (xhr, status, error) {
+          console.error("Erreur lors de la récupération des étudiants:", error);
+          $(".student-choice").empty();
+          $(".student-choice").append(
+            '<option value="">Erreur de chargement</option>'
+          );
+        }
+      });
+    } else {
+      $(".student-choice").empty();
+      $(".student-choice").append(
+        '<option value="">Sélectionner un étudiant</option>'
+      );
+    }
+  }
+
+  function loadStudentsByTeacher() {
+      var teacherId = $(".teacher-choice").val();
+
+      if (teacherId) {
+        $.ajax({
+          url: "{% url 'teacher-get-student' %}",
+          type: "GET",
+          data: {
+            teacher_id: teacherId,
+          },
+          success: function (data) {
+            $(".student-table tbody").empty(); // Vider la table avant de la recharger
+
+            $.each(data.affectations, function (key, aff) {
+    $(".student-table tbody").append(
+        "<tr>" +
+            "<td>" + (aff.student__matricule || '') + "</td>" +
+            "<td>" + (aff.student__names || '') + "</td>" +
+            "<td>" + (aff.student__promotion__code || '') + "</td>" +
+            "<td>" + (aff.student__orientation__sigle || '') + "</td>" +
+            "<td>" + (aff.type || '') + "</td>" +
+        "</tr>"
+    );
+});
+          },
+          error: function (xhr, status, error) {
+            console.error("Erreur lors de la récupération des étudiants:", error);
+            $(".student-table tbody").empty().append(
+              "<tr><td colspan='5'>Erreur de chargement</td></tr>"
+            );
+          }
+        });
+      } else {
+        $(".student-table tbody").empty().append(
+          "<tr><td colspan='5'>Sélectionnez un enseignant</td></tr>"
+        );
+      }
+    }
+
+    // Charger les étudiants au chargement de la page si les valeurs existent
+    loadStudents();
+
+    // Charger les étudiants lors des changements
+    $(".departement-choice, .promotion-choice").change(function () {
+      loadStudents();
+    });
+
+    $(".teacher-choice").change(loadStudentsByTeacher);
+  });
+
+</script>

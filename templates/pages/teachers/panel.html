@@ -1,0 +1,99 @@
+{% extends 'index.html' %} {% load static %} {% block page_content %}
+<div class="main-panel">
+  <div class="content-wrapper">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="home-tab">
+          <div
+            class="d-sm-flex align-items-center justify-content-between border-bottom"
+          >
+            <ul class="nav nav-tabs" role="tablist">
+              {% for academic in academics %}
+              <li class="nav-item">
+                <a
+                  class="nav-link nav-tab {% if forloop.first %}active{% endif %} ps-0"
+                  id="tab-{{ academic.year|slugify }}"
+                  data-bs-toggle="tab"
+                  href="#pane-{{ academic.year|slugify }}"
+                  role="tab"
+                  aria-controls="pane-{{ academic.year|slugify }}"
+                  aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+                  data-year="{{ academic.year }}"
+                >
+                  {{ academic.year }}
+                </a>
+              </li>
+              {% endfor %}
+            </ul>
+            <div>
+              <div class="btn-wrapper">
+                <a href="#" class="btn btn-otline-dark align-items-center"
+                  ><i class="icon-share"></i> Share</a
+                >
+                <a href="#" class="btn btn-otline-dark"
+                  ><i class="icon-printer"></i> Print</a
+                >
+                <a href="#" class="btn btn-primary text-white me-0"
+                  ><i class="icon-download"></i> Export</a
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Content -->
+          <div class="tab-content tab-content-basic">
+            {% for academic in academics %}
+            <div
+              class="tab-pane fade {% if forloop.first %}show active{% endif %}"
+              id="pane-{{ academic.year|slugify }}"
+              role="tabpanel"
+              aria-labelledby="tab-{{ academic.year|slugify }}"
+            >
+              <p>Contenu spécifique pour {{ academic.year }}</p>
+
+             {% include "pages/teachers/teacher-info.html" %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- content-wrapper ends -->
+  <!-- partial:partials/_footer.html -->
+  {% include "includes/footer.html" %}
+  <!-- partial -->
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".nav-tab").forEach(function (tab) {
+      tab.addEventListener("click", function (event) {
+        event.preventDefault();
+
+        let year = this.getAttribute("data-year");
+        let targetPane = document.querySelector(
+          "#pane-" + year.replace(/\s+/g, "-").toLowerCase()
+        );
+
+        // Vérifie si les données ont déjà été chargées
+        if (
+          !targetPane.querySelector(
+            `#content-${year.replace(/\s+/g, "-").toLowerCase()}`
+          ).dataset.loaded
+        ) {
+          fetch(`tab-dash/?year=${year}`)
+            .then((response) => response.json())
+            .then((data) => {
+              let contentDiv = targetPane.querySelector(
+                `#content-${year.replace(/\s+/g, "-").toLowerCase()}`
+              );
+              contentDiv.innerHTML = data.html;
+              contentDiv.dataset.loaded = "true"; // Marque comme chargé
+            })
+            .catch((error) => console.error("Erreur AJAX:", error));
+        }
+      });
+    });
+  });
+</script>
+{% endblock page_content%}

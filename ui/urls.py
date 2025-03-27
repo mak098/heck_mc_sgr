@@ -4,6 +4,7 @@ from . import rapportPdf
 from . import rapportTeacherPdf
 from . import orientationFiliere
 from . import affectations
+from . import teacher
 urlpatterns = [
     path("", views.index, name="dash"),
     path("tab-dash/", views.get_academic_data, name="tab-dash"),
@@ -39,5 +40,11 @@ urlpatterns = [
         "teacher-pdf/<str:year>/<str:teacher>",
         rapportTeacherPdf.ExportPdf.getTeacherStudent,
         name="download-teacher-pdf",
+    ),
+    path("teacher-page/", teacher.teacher_page, name="teacher-page"),
+    path(
+        "teacher-get-student/",
+        teacher.get_students_by_teacher,
+        name="teacher-get-student",
     ),
 ]
