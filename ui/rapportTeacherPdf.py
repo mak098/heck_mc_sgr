@@ -41,7 +41,7 @@ class ExportPdf(viewsets.ModelViewSet):
         if not firm:
             return HttpResponse("Aucune entreprise trouvée", status=404)
 
-        pdf = CustomPDF(orientation="L")  # Mode paysage
+        pdf = CustomPDF(orientation="P")  # Mode paysage
         pdf.add_page()
 
         # Titre principal
@@ -106,32 +106,52 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf.ln(10)
         _teacher = Teacher.objects.get(id=teacher)
 
+        pdf.set_font("Arial", "", 10)
+        pdf.cell(30, 4, "Titre :", 0, 0, "L")
+        pdf.cell(40, 4, _teacher.grade.grade, 0, 1, "L")
+        pdf.ln(3)
+        pdf.cell(30, 4, "Matricule :", 0, 0, "L")
+        pdf.cell(40, 4, _teacher.matricule, 0, 1, "L")
+        pdf.ln(3)
+
+        # Noms
+        pdf.cell(30, 4, "Noms :", 0, 0, "L")
+        pdf.cell(
+            40,
+            4,
+            f"{_teacher.first_name} {_teacher.last_name} {_teacher.name}",
+            0,
+            1,
+            "L",
+        )
+        pdf.ln(3)
+
         # En-tête du tableau avec fond noir
         pdf.set_fill_color(0, 0, 0)  # Noir
         pdf.set_text_color(255, 255, 255)  # Blanc
         pdf.set_font("Arial", "B", 9)
         pdf.cell(
-            30, 8, "Matricule", 1, 0, "C", fill=True
+            20, 8, "Matricule", 1, 0, "L", fill=True
         )  # Largeur ajustée
-        pdf.cell(75, 8, "Noms", 1, 0, "C", fill=True)  # Largeur ajustée
-        pdf.cell(20, 8, "section", 1, 0, "C", fill=True)  # Largeur ajustée
+        pdf.cell(75, 8, "Noms", 1, 0, "L", fill=True)  # Largeur ajustée
+        pdf.cell(20, 8, "section", 1, 0, "L", fill=True)  # Largeur ajustée
         pdf.cell(
-            40, 8, "Depart.", 1, 0, "C", fill=True
+            40, 8, "Depart.", 1, 0, "L", fill=True
         )  # Largeur ajustée
-        pdf.cell(35, 8, "Type", 1, 1, "C", fill=True)  # Largeur ajustée
+        pdf.cell(35, 8, "Prom.", 1, 1, "L", fill=True)  # Largeur ajustée
 
         # Liste des étudiants
         pdf.set_fill_color(255, 255, 255)  # Fond blanc
         pdf.set_text_color(0, 0, 0) 
-       
+
         affectations = Affectation.objects.filter(academic_year=academic,teacher=teacher)
         for affection in affectations:
-            pdf.cell(30, 8, affection.student.matricule, 1, 0, "L")
+            pdf.cell(20, 8, affection.student.matricule, 1, 0, "L")
             pdf.cell(75, 8, affection.student.names, 1, 0, "L")
             pdf.cell(20, 8, affection.student.orientation.section.sigle, 1, 0, "L")
             pdf.cell(40, 8, affection.student.orientation.sigle, 1, 0, "L")
             pdf.cell(
-                35, 8, affection.type.name, 1, 1, "L"
+                35, 8, affection.student.promotion.code, 1, 1, "L"
             )
         # pdf.ln(5)
         pdf.ln(9)
