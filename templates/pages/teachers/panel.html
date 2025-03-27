@@ -30,7 +30,7 @@
                 <a href="#" class="btn btn-otline-dark align-items-center"
                   ><i class="icon-share"></i> Share</a
                 >
-                <a href="#" class="btn btn-otline-dark"
+                <a href="#" id="print-pdf" class="btn btn-otline-dark"
                   ><i class="icon-printer"></i> Print</a
                 >
                 <a href="#" class="btn btn-primary text-white me-0"
@@ -51,7 +51,7 @@
             >
               <p>Contenu spécifique pour {{ academic.year }}</p>
 
-             {% include "pages/teachers/teacher-info.html" %}
+             {% include "pages/teachers/info.html" %}
             </div>
             {% endfor %}
           </div>
@@ -66,7 +66,7 @@
 </div>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".nav-tab").forEach(function (tab) {
+    document.querySelectorAll(".tab-link").forEach(function (tab) {     
       tab.addEventListener("click", function (event) {
         event.preventDefault();
 
@@ -88,12 +88,36 @@
                 `#content-${year.replace(/\s+/g, "-").toLowerCase()}`
               );
               contentDiv.innerHTML = data.html;
+              //contentDiv.innerHTML = "";  // Vide le contenu
+              //contentDiv.dataset.loaded = "";  // Réinitialise le statut chargé
               contentDiv.dataset.loaded = "true"; // Marque comme chargé
             })
             .catch((error) => console.error("Erreur AJAX:", error));
         }
       });
     });
+
+
+    //telecharger le print-pdf
+     document.getElementById("print-pdf").addEventListener("click", function (event) {
+    event.preventDefault(); // Empêcher le comportement par défaut du lien
+
+    // Récupérer l'onglet actif
+    let activeTab = document.querySelector(".nav-link.active");
+
+    if (activeTab) {
+      // Récupérer l'année active
+      let activeYear = activeTab.getAttribute("data-year");
+      let teacher = document.querySelector('.teacher-choice').value;
+
+      // Rediriger vers l'URL de téléchargement du PDF avec l'année active
+      window.location.href = `/download-teacher-student/${activeYear}/${teacher}`;
+    } else {
+      console.error("Aucun onglet actif trouvé.");
+      window.location.href = `/download-pdf/current`;
+    }
+  });
+
   });
 </script>
 {% endblock page_content%}

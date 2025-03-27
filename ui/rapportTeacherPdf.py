@@ -103,7 +103,8 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf.rect(
             x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD"
         )
-        _teacher = Teacher.objects.get(matricule=teacher)
+        pdf.ln(10)
+        _teacher = Teacher.objects.get(id=teacher)
 
         # En-tête du tableau avec fond noir
         pdf.set_fill_color(0, 0, 0)  # Noir
@@ -122,7 +123,7 @@ class ExportPdf(viewsets.ModelViewSet):
         # Liste des étudiants
         pdf.set_fill_color(255, 255, 255)  # Fond blanc
         pdf.set_text_color(0, 0, 0) 
-
+       
         affectations = Affectation.objects.filter(academic_year=academic,teacher=teacher)
         for affection in affectations:
             pdf.cell(30, 8, affection.student.matricule, 1, 0, "L")
@@ -150,5 +151,5 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf_buffer.seek(0)
 
         response = HttpResponse(pdf_buffer, content_type="application/pdf")
-        response["Content-Disposition"] = f'attachment; filename="{_teacher.full_name}.pdf"'
+        response["Content-Disposition"] = f'attachment; filename="{_teacher.first_name}.pdf"'
         return response

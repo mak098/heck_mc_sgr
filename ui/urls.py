@@ -37,7 +37,7 @@ urlpatterns = [
         name="get_students_by_teacher",
     ),
     path(
-        "teacher-pdf/<str:year>/<str:teacher>",
+        "download-teacher-student/<str:year>/<int:teacher>",
         rapportTeacherPdf.ExportPdf.getTeacherStudent,
         name="download-teacher-pdf",
     ),
