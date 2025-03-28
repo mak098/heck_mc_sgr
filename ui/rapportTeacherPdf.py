@@ -12,6 +12,8 @@ from parameter.models import AcademicYear, Filiere, Promotion, Firm
 from student.models import Student
 from teachers.models import Teacher
 from affectation.models import Affectation
+from django.db.models import Count
+import asyncio
 
 
 class CustomPDF(FPDF):
@@ -107,7 +109,7 @@ class ExportPdf(viewsets.ModelViewSet):
         _teacher = Teacher.objects.get(id=teacher)
 
         pdf.set_font("Arial", "", 10)
-        pdf.cell(30, 4, "Titre :", 0, 0, "L")
+        pdf.cell(30, 4, "Grade :", 0, 0, "L")
         pdf.cell(40, 4, _teacher.grade.grade, 0, 1, "L")
         pdf.ln(3)
         pdf.cell(30, 4, "Matricule :", 0, 0, "L")
@@ -125,6 +127,57 @@ class ExportPdf(viewsets.ModelViewSet):
             "L",
         )
         pdf.ln(3)
+
+        # ========== NOUVEAU TABLEAU RECAPITULATIF ==========
+        # Récupérer les données récapitulatives
+        affectations = Affectation.objects.filter(
+            academic_year=academic, teacher=teacher
+        )
+        summary = (
+            affectations.values(
+                "student__orientation__section__sigle",
+                "student__orientation__sigle",
+                "student__promotion__code",
+            )
+            .annotate(total=Count("id"))
+            .order_by(
+                "student__orientation__section__sigle",
+                "student__orientation__sigle",
+                "student__promotion__code",
+            )
+        )
+
+        # Calculer le total général
+        total_general = affectations.count()
+
+        # En-tête du tableau récapitulatif
+        pdf.set_font("Arial", "B", 9)
+        pdf.cell(0, 8, "Récapitulatif par promotion", 0, 1, "L")
+
+        pdf.set_fill_color(200, 200, 200)  # Gris clair
+        pdf.set_text_color(0, 0, 0)
+        pdf.cell(30, 8, "Section", 1, 0, "C", fill=True)
+        pdf.cell(40, 8, "Departement", 1, 0, "C", fill=True)
+        pdf.cell(30, 8, "Promotion", 1, 0, "C", fill=True)
+        pdf.cell(30, 8, "Nb Étudiants", 1, 1, "C", fill=True)
+
+        # Données du récapitulatif
+        pdf.set_fill_color(255, 255, 255)
+        for item in summary:
+            pdf.cell(30, 8, item["student__orientation__section__sigle"], 1, 0, "L")
+            pdf.cell(40, 8, item["student__orientation__sigle"], 1, 0, "L")
+            pdf.cell(30, 8, item["student__promotion__code"], 1, 0, "L")
+            pdf.cell(30, 8, str(item["total"]), 1, 1, "R")
+
+        # Ligne du total général
+        pdf.set_fill_color(220, 220, 220)  # Gris un peu plus foncé
+        pdf.cell(100, 8, "TOTAL GENERAL", 1, 0, "R", fill=True)
+        pdf.cell(30, 8, str(total_general), 1, 1, "R", fill=True)
+
+        pdf.ln(5)  # Espace avant le tableau principal
+
+        # ========== TABLEAU PRINCIPAL EXISTANT ==========
+        # [Votre code existant pour le tableau principal...]
 
         # En-tête du tableau avec fond noir
         pdf.set_fill_color(0, 0, 0)  # Noir
@@ -144,8 +197,9 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf.set_fill_color(255, 255, 255)  # Fond blanc
         pdf.set_text_color(0, 0, 0) 
 
-        affectations = Affectation.objects.filter(academic_year=academic,teacher=teacher)
-        for affection in affectations:
+        affectationss = Affectation.objects.filter(academic_year=academic,teacher=teacher)
+        for affection in affectationss:
+
             pdf.cell(20, 8, affection.student.matricule, 1, 0, "L")
             pdf.cell(75, 8, affection.student.names, 1, 0, "L")
             pdf.cell(20, 8, affection.student.orientation.section.sigle, 1, 0, "L")
