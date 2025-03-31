@@ -7,7 +7,7 @@ class TypeProjectAdmin(admin.ModelAdmin):
 
 @admin.register(Affectation)
 class AffectionAdmin(admin.ModelAdmin):
-    list_display = ["teacher", "type", "academic_year"]
+    list_display = ["teacher", "student", "type", "academic_year"]
     autocomplete_fields = [
         "teacher",
         "type",
