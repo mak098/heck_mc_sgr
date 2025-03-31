@@ -30,11 +30,14 @@
                 <a href="#" class="btn btn-otline-dark align-items-center"
                   ><i class="icon-share"></i> Share</a
                 >
-                <a href="#" id="print-pdf" class="btn btn-otline-dark"
-                  ><i class="icon-printer"></i> Print</a
+                <a
+                  href="#"
+                  id="print-pdf"
+                  class="btn btn-primary text-white me-0"
+                  ><i class="icon-printer"></i> Par enseignant</a
                 >
-                <a href="#" class="btn btn-primary text-white me-0"
-                  ><i class="icon-download"></i> Export</a
+                <a href="#" id="print-synthese" class="btn btn-primary text-white me-0"
+                  ><i class="icon-printer"></i> Enseignants</a
                 >
               </div>
             </div>
@@ -51,7 +54,7 @@
             >
               <p>Contenu spécifique pour {{ academic.year }}</p>
 
-             {% include "pages/teachers/info.html" %}
+              {% include "pages/teachers/info.html" %}
             </div>
             {% endfor %}
           </div>
@@ -66,7 +69,7 @@
 </div>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".tab-link").forEach(function (tab) {     
+    document.querySelectorAll(".tab-link").forEach(function (tab) {
       tab.addEventListener("click", function (event) {
         event.preventDefault();
 
@@ -97,27 +100,49 @@
       });
     });
 
+    //telecharger le print-pdf teacher
+    document
+      .getElementById("print-synthese")
+      .addEventListener("click", function (event) {
+        event.preventDefault(); // Empêcher le comportement par défaut du lien
 
-    //telecharger le print-pdf
-     document.getElementById("print-pdf").addEventListener("click", function (event) {
-    event.preventDefault(); // Empêcher le comportement par défaut du lien
+        // Récupérer l'onglet actif
+        let activeTab = document.querySelector(".nav-link.active");
 
-    // Récupérer l'onglet actif
-    let activeTab = document.querySelector(".nav-link.active");
+        if (activeTab) {
+          // Récupérer l'année active
+          let activeYear = activeTab.getAttribute("data-year");
+          let teacher = document.querySelector(".teacher-choice").value;
 
-    if (activeTab) {
-      // Récupérer l'année active
-      let activeYear = activeTab.getAttribute("data-year");
-      let teacher = document.querySelector('.teacher-choice').value;
+          // Rediriger vers l'URL de téléchargement du PDF avec l'année active
+          window.location.href = `/download-teachers-synthese/${activeYear}`;
+        } else {
+          console.error("Aucun onglet actif trouvé.");
+          window.location.href = `/download-pdf/current`;
+        }
+      });
+    
+      //telecharger le pdf synthetique teacher
+    document
+      .getElementById("print-pdf")
+      .addEventListener("click", function (event) {
+        event.preventDefault(); // Empêcher le comportement par défaut du lien
 
-      // Rediriger vers l'URL de téléchargement du PDF avec l'année active
-      window.location.href = `/download-teacher-student/${activeYear}/${teacher}`;
-    } else {
-      console.error("Aucun onglet actif trouvé.");
-      window.location.href = `/download-pdf/current`;
-    }
-  });
+        // Récupérer l'onglet actif
+        let activeTab = document.querySelector(".nav-link.active");
 
+        if (activeTab) {
+          // Récupérer l'année active
+          let activeYear = activeTab.getAttribute("data-year");
+          let teacher = document.querySelector(".teacher-choice").value;
+
+          // Rediriger vers l'URL de téléchargement du PDF avec l'année active
+          window.location.href = `/download-teacher-student/${activeYear}/${teacher}`;
+        } else {
+          console.error("Aucun onglet actif trouvé.");
+          window.location.href = `/download-pdf/current`;
+        }
+      });
   });
 </script>
 {% endblock page_content%}
