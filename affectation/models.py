@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from teachers.models import Teacher
 from student.models import Student
-from parameter.models import AcademicYear
+from parameter.models import AcademicYear,Section,Promotion
 
 class TypeProjet(models.Model):
     name = models.CharField(max_length=25,primary_key=True,verbose_name="Nom")
@@ -17,20 +17,16 @@ class Affectation(models.Model):
         related_name="affectations_teacher_set",
         verbose_name="Enseignants",
     )
-    type = models.ForeignKey(
-        TypeProjet,
+    section = models.ForeignKey(Section,null=True,blank=True,on_delete=models.PROTECT,related_name="affectation_section_set",verbose_name="Section")    
+    promotion = models.ForeignKey(
+        Promotion,
+        null=True,
+        blank=True,
         on_delete=models.PROTECT,
-        related_name="affectations_type_project_set",
-        verbose_name="Type",
-    )    
-    group_name = models.CharField(max_length=250,default="-",verbose_name="Nom du groupe")    
-    student = models.ForeignKey(
-        Student,
-        on_delete=models.PROTECT,
-        related_name="affectations_students_set",
-        verbose_name="Etudiants"
+        related_name="affectation_promotion_set",
+        verbose_name="Promotion",
     )
-    subject = models.CharField(max_length=256,null=True,blank=True,verbose_name="Sujet")
+    student = models.CharField(max_length=100,default="-",verbose_name="Nom du groupe")    
     academic_year = models.ForeignKey(
         AcademicYear,
         on_delete=models.PROTECT,
