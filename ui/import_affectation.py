@@ -7,7 +7,7 @@ from teachers.models import Teacher
 from django.http import JsonResponse
 
 def import_excel_file(request):
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.")
+
     excel_file = request.FILES.get("file")
     if not excel_file:
         return JsonResponse(
@@ -24,6 +24,7 @@ def import_excel_file(request):
     for row in sheet.iter_rows(min_row=2, values_only=True):
         row_data = dict(zip(headers, row))
         # try:
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>.", row_data["teacher"])
         teacher = Teacher.objects.get(matricule=row_data["teacher"])
         section = (
             Section.objects.get(id=row_data["section"])

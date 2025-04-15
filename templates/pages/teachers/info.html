@@ -17,11 +17,11 @@
               <table class="table table-striped student-table">
                 <thead>
                   <tr>
-                    <th>matricule</th>
+                  
                     <th>noms</th>
-                    <th>promotion</th>
-                    <th>Dep</th>
                     <th>Section</th>
+                    <th>promotion</th>
+                    
                   </tr>
                 </thead>
                 <tbody>
@@ -94,11 +94,9 @@
             $.each(data.affectations, function (key, aff) {
     $(".student-table tbody").append(
         "<tr>" +
-            "<td>" + (aff.student__matricule || '') + "</td>" +
-            "<td>" + (aff.student__names || '') + "</td>" +
-            "<td>" + (aff.student__promotion__code || '') + "</td>" +
-            "<td>" + (aff.student__orientation__sigle || '') + "</td>" +
-            "<td>" + (aff.type || '') + "</td>" +
+            "<td>" + (aff.student || '') + "</td>" +
+            "<td>" + (aff.section__sigle || '') + "</td>" +
+            "<td>" + (aff.promotion__code || '') + "</td>" +
         "</tr>"
     );
 });

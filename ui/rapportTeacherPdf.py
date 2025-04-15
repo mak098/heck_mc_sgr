@@ -135,6 +135,7 @@ class ExportPdf(viewsets.ModelViewSet):
         )
         summary = (
             affectations.values(
+             
                 "section__sigle",
                 "promotion__code",
             )
@@ -163,16 +164,40 @@ class ExportPdf(viewsets.ModelViewSet):
         for item in summary:
             section_sigle = item["section__sigle"] if item["section__sigle"] else "N/A"
             promotion_code = item["promotion__code"] if item["promotion__code"] else "N/A"
-            pdf.cell(40, 8, section_sigle, 1, 0, "L")
-            pdf.cell(30, 8, promotion_code, 1, 0, "L")
+            pdf.cell(55, 8, section_sigle, 1, 0, "L")
+            pdf.cell(45, 8, promotion_code, 1, 0, "L")
             pdf.cell(30, 8, str(item["total"]), 1, 1, "L")
 
         # Ligne du total général
         pdf.set_fill_color(220, 220, 220)  # Gris un peu plus foncé
         pdf.cell(100, 8, "TOTAL GENERAL", 1, 0, "R", fill=True)
         pdf.cell(30, 8, str(total_general), 1, 1, "R", fill=True)
-
         pdf.ln(5)  # Espace avant le tableau principal
+
+        pdf.set_font("Arial", "B", 12)
+        pdf.set_text_color(0, 0, 0)
+        pdf.cell(0, 10, f"Etudiants", 0, 1)
+        pdf.set_text_color(0, 0, 0)
+
+        # En-tête du tableau avec fond noir
+        pdf.set_fill_color(0, 0, 0)  # Noir
+        pdf.set_text_color(255, 255, 255)  # Blanc
+        pdf.set_font("Arial", "B", 9)
+
+        pdf.cell(15, 8, "Num", 1, 0, "C", fill=True)  # Largeur ajustée
+        pdf.cell(60, 8, "Noms", 1, 0, "C", fill=True)  # Largeur ajustée
+        pdf.cell(45, 8, "Section", 1, 0, "C", fill=True)  # Largeur ajustée
+        pdf.cell(45, 8, "Promotion", 1, 0, "C", fill=True)
+        i = 0
+        pdf.set_text_color(0, 0, 0)
+        for aff in affectations:
+            i=i+1
+            pdf.cell(15, 8, f"{str(i)}", 1, 0, "L")
+            pdf.cell(60, 8, aff.student, 1, 0, "L")
+            pdf.cell(45, 8, aff.section.sigle, 1, 0, "L")
+            pdf.cell(45, 8, aff.promotion.code if aff.promotion else "N/A", 1, 1, "L")        
+        
+        pdf.ln(5)
 
         # Sauvegarder le PDF dans un fichier temporaire
         pdf_buffer = BytesIO()
