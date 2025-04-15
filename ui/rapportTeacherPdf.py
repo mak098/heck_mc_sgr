@@ -188,6 +188,7 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf.cell(60, 8, "Noms", 1, 0, "C", fill=True)  # Largeur ajustée
         pdf.cell(45, 8, "Section", 1, 0, "C", fill=True)  # Largeur ajustée
         pdf.cell(45, 8, "Promotion", 1, 0, "C", fill=True)
+        pdf.ln(8)
         i = 0
         pdf.set_text_color(0, 0, 0)
         for aff in affectations:
@@ -196,7 +197,7 @@ class ExportPdf(viewsets.ModelViewSet):
             pdf.cell(60, 8, aff.student, 1, 0, "L")
             pdf.cell(45, 8, aff.section.sigle, 1, 0, "L")
             pdf.cell(45, 8, aff.promotion.code if aff.promotion else "N/A", 1, 1, "L")        
-        
+
         pdf.ln(5)
 
         # Sauvegarder le PDF dans un fichier temporaire
