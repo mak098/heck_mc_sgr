@@ -58,11 +58,10 @@ def get_students_by_teacher(request):
             .select_related("student")
             .values(
                 "id",
-                "student__matricule",
-                "student__names",
-                "student__promotion__code",  # suppose que promotion est un modèle lié
-                "student__orientation__sigle",  # suppose que orientation est un modèle lié
-                "type",
+                "student",
+                "promotion__code",  # suppose que promotion est un modèle lié
+                "section__sigle",  # suppose que orientation est un modèle lié
+               
             )
         )
 

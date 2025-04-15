@@ -6,7 +6,7 @@
         <form class="forms-group">
           <div class="form-group">
             <label>Selectionner un enseignant</label>
-            <select class="js-example-basic-single w-100 teacher-choice" >
+            <select class="js-example-basic-single w-100 teacher-choice">
               {% for teacher in teachers %}
               <option value="{{ teacher.id }}">{{teacher.full_name }}</option>
               {% endfor %}
@@ -21,21 +21,17 @@
       <div class="card-body">
         <h4 class="card-title">Liste des etudiants par enseignant</h4>
         <div class="table-responsive">
-              <table class="table table-striped student-table">
-                <thead>
-                  <tr>
-                    <th>matricule</th>
-                    <th>noms</th>
-                    <th>promotion</th>
-                    <th>Dep</th>
-                    <th>Section</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  
-                </tbody>
-              </table>
-            </div>
+          <table class="table table-striped student-table">
+            <thead>
+              <tr>
+                <th>noms</th>
+                <th>Section</th>
+                <th>promotion</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -43,47 +39,54 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
- $(document).ready(function () {
-  function loadStudents() {
-    var departementId = $(".departement-choice").val();
-    var promotionId = $(".promotion-choice").val();
+  $(document).ready(function () {
+    function loadStudents() {
+      var departementId = $(".departement-choice").val();
+      var promotionId = $(".promotion-choice").val();
 
-    if (departementId && promotionId) {
-      $.ajax({
-        url: "{% url 'get_students' %}",
-        type: "GET",
-        data: {
-          departement_id: departementId,
-          promotion_id: promotionId,
-        },
-        success: function (data) {
-          $(".student-choice").empty();
-          $(".student-choice").append(
-            '<option value="">Sélectionner un étudiant</option>'
-          );
-          $.each(data.students, function (key, student) {
+      if (departementId && promotionId) {
+        $.ajax({
+          url: "{% url 'get_students' %}",
+          type: "GET",
+          data: {
+            departement_id: departementId,
+            promotion_id: promotionId,
+          },
+          success: function (data) {
+            $(".student-choice").empty();
             $(".student-choice").append(
-              '<option value="' + student.id + '">' + student.names + "</option>"
+              '<option value="">Sélectionner un étudiant</option>'
             );
-          });
-        },
-        error: function (xhr, status, error) {
-          console.error("Erreur lors de la récupération des étudiants:", error);
-          $(".student-choice").empty();
-          $(".student-choice").append(
-            '<option value="">Erreur de chargement</option>'
-          );
-        }
-      });
-    } else {
-      $(".student-choice").empty();
-      $(".student-choice").append(
-        '<option value="">Sélectionner un étudiant</option>'
-      );
+            $.each(data.students, function (key, student) {
+              $(".student-choice").append(
+                '<option value="' +
+                  student.id +
+                  '">' +
+                  student.names +
+                  "</option>"
+              );
+            });
+          },
+          error: function (xhr, status, error) {
+            console.error(
+              "Erreur lors de la récupération des étudiants:",
+              error
+            );
+            $(".student-choice").empty();
+            $(".student-choice").append(
+              '<option value="">Erreur de chargement</option>'
+            );
+          },
+        });
+      } else {
+        $(".student-choice").empty();
+        $(".student-choice").append(
+          '<option value="">Sélectionner un étudiant</option>'
+        );
+      }
     }
-  }
 
-  function loadStudentsByTeacher() {
+    function loadStudentsByTeacher() {
       var teacherId = $(".teacher-choice").val();
 
       if (teacherId) {
@@ -97,28 +100,35 @@
             $(".student-table tbody").empty(); // Vider la table avant de la recharger
 
             $.each(data.affectations, function (key, aff) {
-    $(".student-table tbody").append(
-        "<tr>" +
-            "<td>" + (aff.student__matricule || '') + "</td>" +
-            "<td>" + (aff.student__names || '') + "</td>" +
-            "<td>" + (aff.student__promotion__code || '') + "</td>" +
-            "<td>" + (aff.student__orientation__sigle || '') + "</td>" +
-            "<td>" + (aff.type || '') + "</td>" +
-        "</tr>"
-    );
-});
+              $(".student-table tbody").append(
+                "<tr>" +
+                  "<td>" +
+                  (aff.student || "") +
+                  "</td>" +
+                  "<td>" +
+                  (aff.section__sigle || "") +
+                  "</td>" +
+                  "<td>" +
+                  (aff.promotion__code || "") +
+                  "</td>" +
+                  "</tr>"
+              );
+            });
           },
           error: function (xhr, status, error) {
-            console.error("Erreur lors de la récupération des étudiants:", error);
-            $(".student-table tbody").empty().append(
-              "<tr><td colspan='5'>Erreur de chargement</td></tr>"
+            console.error(
+              "Erreur lors de la récupération des étudiants:",
+              error
             );
-          }
+            $(".student-table tbody")
+              .empty()
+              .append("<tr><td colspan='5'>Erreur de chargement</td></tr>");
+          },
         });
       } else {
-        $(".student-table tbody").empty().append(
-          "<tr><td colspan='5'>Sélectionnez un enseignant</td></tr>"
-        );
+        $(".student-table tbody")
+          .empty()
+          .append("<tr><td colspan='5'>Sélectionnez un enseignant</td></tr>");
       }
     }
 
@@ -132,5 +142,4 @@
 
     $(".teacher-choice").change(loadStudentsByTeacher);
   });
-
 </script>

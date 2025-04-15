@@ -5,6 +5,7 @@ from . import rapportTeacherPdf
 from . import orientationFiliere
 from . import affectations
 from . import teacher
+from . import import_affectation
 urlpatterns = [
     path("", views.index, name="dash"),
     path("tab-dash/", views.get_academic_data, name="tab-dash"),
@@ -30,6 +31,11 @@ urlpatterns = [
         affectations.affectation_page,
         name="affectation-by-section",
     ),
+    path(
+        "importation_page",
+        affectations.importation_page,
+        name="importation_page",
+    ),
     path("get-students/", affectations.get_students, name="get_students"),
     path(
         "get_students_by_teacher/",
@@ -51,5 +57,10 @@ urlpatterns = [
         "teacher-get-student/",
         teacher.get_students_by_teacher,
         name="teacher-get-student",
+    ),
+    path(
+        "import-excel/",
+        import_affectation.import_excel_file,
+        name="import_affectation",
     ),
 ]

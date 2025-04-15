@@ -36,7 +36,7 @@ class Teacher(User):
     type = models.CharField(
         max_length=25, default="permanant",choices=(
             ("permanent","Permenant"),
-            ("visiteur","visiteuu")
+            ("visiteur","visiteur")
         ), null=True, blank=True, verbose_name="Type"
     )
     section = models.ForeignKey(

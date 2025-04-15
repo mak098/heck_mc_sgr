@@ -135,15 +135,13 @@ class ExportPdf(viewsets.ModelViewSet):
         )
         summary = (
             affectations.values(
-                "student__orientation__section__sigle",
-                "student__orientation__sigle",
-                "student__promotion__code",
+                "section__sigle",
+                "promotion__code",
             )
             .annotate(total=Count("id"))
             .order_by(
-                "student__orientation__section__sigle",
-                "student__orientation__sigle",
-                "student__promotion__code",
+                "section__sigle",
+                "promotion__code",
             )
         )
 
@@ -156,18 +154,18 @@ class ExportPdf(viewsets.ModelViewSet):
 
         pdf.set_fill_color(200, 200, 200)  # Gris clair
         pdf.set_text_color(0, 0, 0)
-        pdf.cell(30, 8, "Section", 1, 0, "C", fill=True)
-        pdf.cell(40, 8, "Departement", 1, 0, "C", fill=True)
-        pdf.cell(30, 8, "Promotion", 1, 0, "C", fill=True)
+        pdf.cell(55, 8, "Section", 1, 0, "C", fill=True)
+        pdf.cell(45, 8, "Promotion", 1, 0, "C", fill=True)
         pdf.cell(30, 8, "Nb Étudiants", 1, 1, "C", fill=True)
 
         # Données du récapitulatif
         pdf.set_fill_color(255, 255, 255)
         for item in summary:
-            pdf.cell(30, 8, item["student__orientation__section__sigle"], 1, 0, "L")
-            pdf.cell(40, 8, item["student__orientation__sigle"], 1, 0, "L")
-            pdf.cell(30, 8, item["student__promotion__code"], 1, 0, "L")
-            pdf.cell(30, 8, str(item["total"]), 1, 1, "R")
+            section_sigle = item["section__sigle"] if item["section__sigle"] else "N/A"
+            promotion_code = item["promotion__code"] if item["promotion__code"] else "N/A"
+            pdf.cell(40, 8, section_sigle, 1, 0, "L")
+            pdf.cell(30, 8, promotion_code, 1, 0, "L")
+            pdf.cell(30, 8, str(item["total"]), 1, 1, "L")
 
         # Ligne du total général
         pdf.set_fill_color(220, 220, 220)  # Gris un peu plus foncé
@@ -273,15 +271,14 @@ class ExportPdf(viewsets.ModelViewSet):
             )
             summary = (
                 affectations.values(
-                    "student__orientation__section__sigle",
-                    "student__orientation__sigle",
-                    "student__promotion__code",
+                    "section__sigle",
+                    "promotion__code",
                 )
                 .annotate(total=Count("id"))
                 .order_by(
-                    "student__orientation__section__sigle",
-                    "student__orientation__sigle",
-                    "student__promotion__code",
+                    "section__sigle",
+                  
+                    "promotion__code",
                 )
             )
 
@@ -301,17 +298,15 @@ class ExportPdf(viewsets.ModelViewSet):
 
             pdf.set_fill_color(200, 200, 200)  # Gris clair
             pdf.set_text_color(0, 0, 0)
-            pdf.cell(30, 8, "Section", 1, 0, "C", fill=True)
-            pdf.cell(40, 8, "Departement", 1, 0, "C", fill=True)
-            pdf.cell(30, 8, "Promotion", 1, 0, "C", fill=True)
+            pdf.cell(55, 8, "Section", 1, 0, "C", fill=True)
+            pdf.cell(45, 8, "Promotion", 1, 0, "C", fill=True)
             pdf.cell(30, 8, "Nb Étudiants", 1, 1, "C", fill=True)
 
             # Données du récapitulatif
             pdf.set_fill_color(255, 255, 255)
             for item in summary:
-                pdf.cell(30, 8, item["student__orientation__section__sigle"], 1, 0, "L")
-                pdf.cell(40, 8, item["student__orientation__sigle"], 1, 0, "L")
-                pdf.cell(30, 8, item["student__promotion__code"], 1, 0, "L")
+                pdf.cell(55, 8, item["section__sigle"], 1, 0, "L")
+                pdf.cell(45, 8, item["promotion__code"], 1, 0, "L")
                 pdf.cell(30, 8, str(item["total"]), 1, 1, "R")
 
             # Ligne du total général
@@ -330,12 +325,14 @@ class ExportPdf(viewsets.ModelViewSet):
             1,
             "L",
         )
-
+        pdf.ln(5)
         # Sauvegarder le PDF dans un fichier temporaire
         pdf_buffer = BytesIO()
         pdf.output(pdf_buffer, dest="S")
         pdf_buffer.seek(0)
 
         response = HttpResponse(pdf_buffer, content_type="application/pdf")
-        response["Content-Disposition"] = f'attachment; filename="rapport_synthese{academic.year}.pdf"'
+        response["Content-Disposition"] = (
+            f'attachment; filename="{academic.year}.pdf"'
+        )
         return response
