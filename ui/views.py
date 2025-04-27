@@ -1,7 +1,7 @@
 import json
 from django.shortcuts import render
 from django.db.models import Count
-from parameter.models import Section,Filiere,AcademicYear,Promotion
+from parameter.models import Section, Filiere, AcademicYear, Promotion
 from authentication.models import User
 from student.models import Student
 from affectation.models import Affectation
@@ -13,12 +13,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_list_or_404
 from .forms import SigninForm
 from rest_framework.response import Response
-from rest_framework import viewsets,status
+from rest_framework import viewsets, status
 from django.conf import settings
 from django.conf.urls import handler404
 from django.shortcuts import render
 from django.db import models
 from django.db.models import F
+
 
 def custom_404(request, exception):
     return render(request, "pages/404.html", status=404)
@@ -26,6 +27,7 @@ def custom_404(request, exception):
 
 if settings.DEBUG is False:
     handler404 = custom_404
+
 
 def index(request):
     current_url = request.resolver_match.view_name
@@ -64,29 +66,30 @@ def index(request):
     sections = Section.objects.all()
 
     promotions = (
-    Promotion.objects
-    .filter(affectation_promotion_set__academic_year=academic)
-    .annotate(
-        student_count=Count("affectation_promotion_set"),
-        section_name=F("affectation_promotion_set__section__name"),
-        section_sigle=F("affectation_promotion_set__section__sigle"),
-        section_id=F("affectation_promotion_set__section__id"),
+        Promotion.objects.filter(affectation_promotion_set__academic_year=academic)
+        .annotate(
+            student_count=Count("affectation_promotion_set"),
+            section_name=F("affectation_promotion_set__section__name"),
+            section_sigle=F("affectation_promotion_set__section__sigle"),
+            section_id=F("affectation_promotion_set__section__id"),
+        )
+        .values(
+            "id",
+            "code",
+            "name",
+            "student_count",
+            "section_name",
+            "section_sigle",
+            "section_id",
+        )
+        .order_by("section_name", "name")
     )
-    .values(
-        "id",
-        "code",
-        "name",
-        "student_count",
-        "section_name",
-        "section_sigle",
-        "section_id",
-    )
-    .order_by("section_name", "name")
-)
     promotion_data = list(promotions)
     sections_affectation_counts = []
     for section in sections:
-        affectation = Affectation.objects.filter(section=section,academic_year=academic).count()
+        affectation = Affectation.objects.filter(
+            section=section, academic_year=academic
+        ).count()
         sections_affectation_counts.append(
             {"name": section.name, "sigle": section.sigle, "count": affectation}
         )
@@ -107,19 +110,20 @@ def index(request):
         },
     )
 
+
 def login_page(request):
     error = False
     if request.user.is_authenticated:
-        return redirect('dash')
+        return redirect("dash")
     else:
         form = SigninForm(request.POST or None)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password"]
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('dash')
+                return redirect("dash")
             else:
                 error = True
     return render(request, "pages/login.html", locals())
@@ -156,10 +160,25 @@ def get_academic_data(request):
 
     filieres = Filiere.objects.all()
     promotions = (
-        Promotion.objects.filter(student_promotion_set__academic_year=academic)
-        .annotate(student_count=Count("student_promotion_set"))
-        .values("id", "code", "name", "student_count")
+        Promotion.objects.filter(affectation_promotion_set__academic_year=academic)
+        .annotate(
+            student_count=Count("affectation_promotion_set"),
+            section_name=F("affectation_promotion_set__section__name"),
+            section_sigle=F("affectation_promotion_set__section__sigle"),
+            section_id=F("affectation_promotion_set__section__id"),
+        )
+        .values(
+            "id",
+            "code",
+            "name",
+            "student_count",
+            "section_name",
+            "section_sigle",
+            "section_id",
+        )
+        .order_by("section_name", "name")
     )
+
     promotion_data = list(promotions)
     sections = Section.objects.all()
     sections_affectation_counts = []
@@ -182,18 +201,19 @@ def get_academic_data(request):
                 "academics": academic_years,
                 "feminin": feminin,
                 "masculin": masculin,
-                "promotions": promotion_data,
+                "promotions": promotions,
                 "sections_affectation_counts": sections_affectation_counts,
             },
         )
     }
     return JsonResponse(data)
 
-def update_promotion(request,promotion):
+
+def update_promotion(request, promotion):
     pro = Promotion.objects.get(id=promotion)
     students = Student.objects.all()
-    for student in students :
-        student.promotion =pro
+    for student in students:
+        student.promotion = pro
         student.save()
-    
-    return Response({"message":"update success"},status=status.HTTP_200_OK)
+
+    return Response({"message": "update success"}, status=status.HTTP_200_OK)
