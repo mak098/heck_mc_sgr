@@ -8,10 +8,14 @@
       {% for section in sections_affectation_counts %}
       <div>
         <p class="statistics-title">{{ section.sigle }}</p>
-        <h3 class="rate-percentage text-success text-center">{{ section.count }}</h3>
-        {% comment %} <p class="text-success text-center">
+        <h3 class="rate-percentage text-success text-center">
+          {{ section.count }}
+        </h3>
+        {% comment %}
+        <p class="text-success text-center">
           <span>{{ section.percentage|floatformat:2 }}%</span>
-        </p> {% endcomment %}
+        </p>
+        {% endcomment %}
       </div>
       {% empty %}
 
@@ -39,37 +43,24 @@
                   Lorem Ipsum is simply dummy text of the printing
                 </h5>
               </div>
-              <div id=    });performanceLine-legend"></div>
+              <div id="performanceLine-legend"></div>
             </div>
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-striped">
                   <thead>
                     <tr>
-                      <th>code</th>
+                      <th>section</th>
                       <th>promotion</th>
-                      <th>Progress</th>
                       <th>Nombre</th>
                     </tr>
                   </thead>
                   <tbody>
                     {% for promotion in promotions %}
                     <tr>
-                      <td class="py-1">{{ promotion.code }}</td>
+                      <td class="py-1">{{ promotion.section_name }}</td>
                       <td>{{ promotion.name }}</td>
-                      <td>
-                        <div class="progress">
-                          <div
-                            class="progress-bar bg-success"
-                            role="progressbar"
-                            style="width: 0%"
-                            data-student-count="{{ promotion.student_count }}"
-                            data-total-students="{{ students }}"
-                            aria-valuemin="0"
-                            aria-valuemax="100"
-                          ></div>
-                        </div>
-                      </td>
+
                       <td>{{ promotion.student_count }}</td>
                     </tr>
                     {% endfor %}
@@ -93,7 +84,7 @@
             <div class="row">
               <div class="col-sm-12">
                 <p class="status-summary-ight-white mb-1">
-                  Etudiants au master complementaire
+                  Nombre total d'affectations
                 </p>
                 <h2 class="text-info">{{ students }}</h2>
               </div>
@@ -115,26 +106,10 @@
                       class="progressbar-js-circle pr-2"
                     ></div>
                   </div>
-                  <div>
-                    <p class="text-small mb-2">Feminin</p>
-                    <h4 class="mb-0 fw-bold">{{ feminin }}</h4>
-                  </div>
+                 
                 </div>
               </div>
-              <div class="col-lg-6">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="circle-progress-width">
-                    <div
-                      id="visitperday"
-                      class="progressbar-js-circle pr-2"
-                    ></div>
-                  </div>
-                  <div>
-                    <p class="text-small mb-2">Masculin</p>
-                    <h4 class="mb-0 fw-bold">{{ masculin }}</h4>
-                  </div>
-                </div>
-              </div>
+              
             </div>
           </div>
         </div>

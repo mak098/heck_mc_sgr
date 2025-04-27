@@ -18,6 +18,7 @@ from django.conf import settings
 from django.conf.urls import handler404
 from django.shortcuts import render
 from django.db import models
+from django.db.models import F
 
 def custom_404(request, exception):
     return render(request, "pages/404.html", status=404)
@@ -50,7 +51,7 @@ def index(request):
 
     academic_years = AcademicYear.objects.filter().order_by("-created_at")
     # Calcul du nombre total d'étudiants
-    total_students = Student.objects.filter(academic_year=academic).count()
+    total_students = Affectation.objects.filter(academic_year=academic).count()
     feminin = Student.objects.filter(gender="Féminin", academic_year=academic).count()
     masculin = Student.objects.filter(gender="Masculin", academic_year=academic).count()
     # Ajouter le pourcentage directement dans le queryset
@@ -63,10 +64,25 @@ def index(request):
     sections = Section.objects.all()
 
     promotions = (
-        Promotion.objects.filter(student_promotion_set__academic_year=academic)
-        .annotate(student_count=Count("student_promotion_set"))
-        .values("id","code" ,"name", "student_count")
+    Promotion.objects
+    .filter(affectation_promotion_set__academic_year=academic)
+    .annotate(
+        student_count=Count("affectation_promotion_set"),
+        section_name=F("affectation_promotion_set__section__name"),
+        section_sigle=F("affectation_promotion_set__section__sigle"),
+        section_id=F("affectation_promotion_set__section__id"),
     )
+    .values(
+        "id",
+        "code",
+        "name",
+        "student_count",
+        "section_name",
+        "section_sigle",
+        "section_id",
+    )
+    .order_by("section_name", "name")
+)
     promotion_data = list(promotions)
     sections_affectation_counts = []
     for section in sections:
@@ -86,7 +102,7 @@ def index(request):
             "academics": academic_years,
             "feminin": feminin,
             "masculin": masculin,
-            "promotions": promotion_data,
+            "promotions": promotions,
             "sections_affectation_counts": sections_affectation_counts,
         },
     )
@@ -129,7 +145,7 @@ def get_academic_data(request):
 
     academic_years = AcademicYear.objects.filter().order_by("-created_at")
     # Calcul du nombre total d'étudiants
-    total_students = Student.objects.filter(academic_year=academic).count()
+    total_students = Affectation.objects.filter(academic_year=academic).count()
     feminin = Student.objects.filter(gender="Féminin", academic_year=academic).count()
     masculin = Student.objects.filter(gender="Masculin", academic_year=academic).count()
     # Ajouter le pourcentage directement dans le queryset
