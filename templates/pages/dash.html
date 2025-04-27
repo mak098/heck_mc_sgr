@@ -91,8 +91,8 @@
                 `#content-${year.replace(/\s+/g, "-").toLowerCase()}`
               );
               contentDiv.innerHTML = data.html;
-              //contentDiv.innerHTML = "";  // Vide le contenu
-              //contentDiv.dataset.loaded = "";  // Réinitialise le statut chargé
+              contentDiv.innerHTML = "";  // Vide le contenu
+              contentDiv.dataset.loaded = "";  // Réinitialise le statut chargé
               contentDiv.dataset.loaded = "true"; // Marque comme chargé
             })
             .catch((error) => console.error("Erreur AJAX:", error));

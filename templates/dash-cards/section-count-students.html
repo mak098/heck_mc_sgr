@@ -5,10 +5,10 @@
     <div
       class="statistics-details d-flex align-items-center justify-content-between"
     >
-      {% for section in sections_count %}
+      {% for section in sections_affectation_counts %}
       <div>
         <p class="statistics-title">{{ section.sigle }}</p>
-        <h3 class="rate-percentage text-success text-center">{{ section.student_count }}</h3>
+        <h3 class="rate-percentage text-success text-center">{{ section.count }}</h3>
         {% comment %} <p class="text-success text-center">
           <span>{{ section.percentage|floatformat:2 }}%</span>
         </p> {% endcomment %}

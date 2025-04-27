@@ -4,6 +4,7 @@ from django.db.models import Count
 from parameter.models import Section,Filiere,AcademicYear,Promotion
 from authentication.models import User
 from student.models import Student
+from affectation.models import Affectation
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 
@@ -37,7 +38,7 @@ def index(request):
     filiere_with_student_count = Filiere.objects.filter(
         student_orientation_set__academic_year=academic  # Traversée de relation correcte
     ).annotate(student_count=Count("student_orientation_set", distinct=True))
-    
+
     sections_with_student_counts = Section.objects.annotate(
         student_count=Count(
             "filiere_section_set__student_orientation_set",
@@ -46,6 +47,7 @@ def index(request):
             ),
         )
     )
+
     academic_years = AcademicYear.objects.filter().order_by("-created_at")
     # Calcul du nombre total d'étudiants
     total_students = Student.objects.filter(academic_year=academic).count()
@@ -66,7 +68,12 @@ def index(request):
         .values("id","code" ,"name", "student_count")
     )
     promotion_data = list(promotions)
-
+    sections_affectation_counts = []
+    for section in sections:
+        affectation = Affectation.objects.filter(section=section,academic_year=academic).count()
+        sections_affectation_counts.append(
+            {"name": section.name, "sigle": section.sigle, "count": affectation}
+        )
     return render(
         request,
         "pages/dash.html",
@@ -80,6 +87,7 @@ def index(request):
             "feminin": feminin,
             "masculin": masculin,
             "promotions": promotion_data,
+            "sections_affectation_counts": sections_affectation_counts,
         },
     )
 
@@ -137,6 +145,15 @@ def get_academic_data(request):
         .values("id", "code", "name", "student_count")
     )
     promotion_data = list(promotions)
+    sections = Section.objects.all()
+    sections_affectation_counts = []
+    for section in sections:
+        affectation = Affectation.objects.filter(
+            section=section, academic_year=academic
+        ).count()
+        sections_affectation_counts.append(
+            {"name": section.name, "sigle": section.sigle, "count": affectation}
+        )
 
     # Retourner les données sous forme de JSON
     data = {
@@ -150,6 +167,7 @@ def get_academic_data(request):
                 "feminin": feminin,
                 "masculin": masculin,
                 "promotions": promotion_data,
+                "sections_affectation_counts": sections_affectation_counts,
             },
         )
     }
