@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     "student",
     "teachers",
     "archive",
-    "affectation"
+    "affectation",
+    "finaliste"
 ]
 
 # chart conf
