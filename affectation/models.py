@@ -27,6 +27,7 @@ class Affectation(models.Model):
         verbose_name="Promotion",
     )
     student = models.CharField(max_length=100,default="-",verbose_name="Nom du groupe")    
+    matricule = models.CharField(max_length=100,default="-", verbose_name="Matricule")
     academic_year = models.ForeignKey(
         AcademicYear,
         on_delete=models.PROTECT,

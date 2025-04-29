@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from parameter.models import Filiere, AcademicYear, DocumentFolde, Promotion
-
+from affectation.models import Affectation
 
 class Finaliste(models.Model):
     matricule = models.CharField(max_length=25, unique=True, verbose_name="Matricule")
@@ -70,3 +70,7 @@ class Finaliste(models.Model):
         verbose_name = "Finaliste"
         verbose_name_plural = "Finalistes"
         db_table = "finaliste"
+
+
+class AffectationLiaison(models.Model):
+    pass
