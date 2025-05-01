@@ -26,7 +26,7 @@ class Affectation(models.Model):
         related_name="affectation_promotion_set",
         verbose_name="Promotion",
     )
-    student = models.CharField(max_length=100,default="-",verbose_name="Nom du groupe")    
+    student = models.CharField(max_length=100,default="-",verbose_name="Nom de l'etudiant")    
     matricule = models.CharField(max_length=100,default="-", verbose_name="Matricule")
     academic_year = models.ForeignKey(
         AcademicYear,
@@ -42,6 +42,19 @@ class Affectation(models.Model):
         related_name="affectation_created_by_set",
         verbose_name="Utilisateur",
     )
+    management_fees = models.FloatField(default=0.00,verbose_name="Frais de direction")
+    date_management_fees = models.DateTimeField(
+        null=True, blank=True, verbose_name="Date payement frais de direction"
+    )
+    deposit_fees = models.FloatField(default=0.00, verbose_name="Frais de depot")
+    date_deposit_fees = models.DateTimeField(
+        null=True, blank=True, verbose_name="Date payement frais de depot"
+    )
+
+    teacher_amount_collected = models.FloatField(
+        default=0.00, verbose_name="Montant percu par l'enseignant"
+    )
+    date_teacher_amount_collected = models.DateTimeField(null=True,blank=True,verbose_name="Date perception de l'enseignant")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)     
 

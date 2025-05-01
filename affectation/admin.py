@@ -7,8 +7,17 @@ class TypeProjectAdmin(admin.ModelAdmin):
 
 @admin.register(Affectation)
 class AffectionAdmin(admin.ModelAdmin):
-    list_display = ["teacher", "student", "section", "academic_year"]
-    search_fields = ["teacher__matricule", "teacher__name","student"]
+    list_display = [
+        "teacher",
+        "matricule",
+        "student",
+        "management_fees",
+        "deposit_fees",
+        "teacher_amount_collected",
+        "section",
+        "academic_year",
+    ]
+    search_fields = ["teacher__matricule", "teacher__name","student","matricule"]
     autocomplete_fields = [
         "teacher",
         "section",

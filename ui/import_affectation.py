@@ -1,10 +1,11 @@
 from affectation.models import Affectation
 from rest_framework.response import Response
-from rest_framework import viewsets,status
+from rest_framework import viewsets, status
 import openpyxl
-from parameter.models import Section,Promotion,AcademicYear
+from parameter.models import Section, Promotion, AcademicYear
 from teachers.models import Teacher
 from django.http import JsonResponse
+
 
 def import_excel_file(request):
 
@@ -24,7 +25,6 @@ def import_excel_file(request):
     for row in sheet.iter_rows(min_row=2, values_only=True):
         row_data = dict(zip(headers, row))
         # try:
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>.", row_data["teacher"])
         teacher = Teacher.objects.get(matricule=row_data["teacher"])
         section = (
             Section.objects.get(id=row_data["section"])
@@ -36,18 +36,18 @@ def import_excel_file(request):
             if row_data.get("promotion")
             else None
         )
-        academic_year = AcademicYear.objects.get(
-            year=row_data["academic_year"]
-        )
-
+        academic_year = AcademicYear.objects.get(year=row_data["academic_year"])
+        matricule=row_data.get("matricule", "-")
+        if Affectation.objects.filter(teacher=teacher,matricule=matricule,academic_year=academic_year).exists():pass
         Affectation.objects.create(
             teacher=teacher,
             section=section,
             promotion=promotion,
-            student=row_data.get("student", "-"),
+            student=row_data.get("names", "-"),
+            matricule=matricule,
             academic_year=academic_year,
-            affected_by=request.user
-            )
+            affected_by=request.user,
+        )
         success_count += 1
 
         # except Exception as e:

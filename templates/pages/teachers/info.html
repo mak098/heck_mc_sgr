@@ -18,6 +18,7 @@
                 <thead>
                   <tr>
                   
+                    <th>Matricule</th>
                     <th>noms</th>
                     <th>Section</th>
                     <th>promotion</th>
@@ -94,6 +95,7 @@
             $.each(data.affectations, function (key, aff) {
     $(".student-table tbody").append(
         "<tr>" +
+            "<td>" + (aff.matricule || '') + "</td>" +
             "<td>" + (aff.student || '') + "</td>" +
             "<td>" + (aff.section__sigle || '') + "</td>" +
             "<td>" + (aff.promotion__code || '') + "</td>" +
