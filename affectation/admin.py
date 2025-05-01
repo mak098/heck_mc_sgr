@@ -14,7 +14,7 @@ class AffectionAdmin(admin.ModelAdmin):
         "management_fees",
         "deposit_fees",
         "teacher_amount_collected",
-        "section",
+        "section_sigle",
         "academic_year",
     ]
     search_fields = ["teacher__matricule", "teacher__name","student","matricule"]
@@ -31,3 +31,7 @@ class AffectionAdmin(admin.ModelAdmin):
         "promotion",
         "academic_year",
     ]
+
+    def section_sigle(self, obj):
+        return obj.section.sigle
+    section_sigle.short_description = "Section"
