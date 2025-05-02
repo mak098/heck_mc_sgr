@@ -9,6 +9,25 @@ class TypeProjet(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+class Prevision(models.Model):
+    management_fees = models.FloatField(default=0.00, verbose_name="Frais de direction")
+    deposit_fees = models.FloatField(default=0.00, verbose_name="Frais de depot")
+    affected_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="prevision_created_by_set",
+        verbose_name="Utilisateur",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)     
+
+    class Meta:
+        verbose_name = "Prevision"
+        verbose_name_plural = "Previsions"
+        db_table = "previsions"
+
 
 class Affectation(models.Model):
     teacher = models.ForeignKey(
