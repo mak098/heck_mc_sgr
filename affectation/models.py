@@ -12,6 +12,13 @@ class TypeProjet(models.Model):
 class Prevision(models.Model):
     management_fees = models.FloatField(default=0.00, verbose_name="Frais de direction")
     deposit_fees = models.FloatField(default=0.00, verbose_name="Frais de depot")
+    academic_year = models.ForeignKey(
+        AcademicYear,
+        on_delete=models.PROTECT,
+        related_name="prevision_academic_year_set",
+        verbose_name="Année academique",
+    )
+    promotion = models.ForeignKey(Promotion,on_delete=models.PROTECT,related_name="prevision_promotion_set",verbose_name="Promotion")
     affected_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,

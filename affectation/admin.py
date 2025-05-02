@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TypeProjet,Affectation
+from .models import TypeProjet, Affectation, Prevision
 
 @admin.register(TypeProjet)
 class TypeProjectAdmin(admin.ModelAdmin):
@@ -35,3 +35,8 @@ class AffectionAdmin(admin.ModelAdmin):
     def section_sigle(self, obj):
         return obj.section.sigle
     section_sigle.short_description = "Section"
+
+@admin.register(Prevision)
+class PrevisionAdmin(admin.ModelAdmin):
+    list_display = ["promotion", "deposit_fees", "management_fees", "academic_year"]
+    list_filter = ["promotion", "academic_year"]
