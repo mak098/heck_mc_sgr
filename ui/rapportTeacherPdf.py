@@ -48,24 +48,22 @@ class ExportPdf(viewsets.ModelViewSet):
 
         pdf.set_font("Arial", "B", 14)
         pdf.cell(0, 10, "Republique democratique du Congo".upper(), 0, 1, "C")
-
-        pdf.set_text_color(0, 0, 255)
         pdf.set_font("Arial", "B", 10)
         pdf.cell(0, 2, "Ministère de l'Enseignement Supérieur et Universitaire".upper(), 0, 1, "C")
 
         pdf.set_text_color(0, 0, 0)
         pdf.set_font("Arial", "B", 10)
         pdf.cell(0, 10, firm.name, 0, 1, "C")
-        pdf.cell(0, 10, firm.service, 0, 1, "C")
 
-        pdf.ln(1)
         logo_path = "media/" + str(firm.logo)
         if os.path.exists(logo_path):
             pdf.image(logo_path, x=(pdf.w / 2 - 12.5), y=pdf.get_y(), w=25, h=25)
         else:
             pdf.cell(0, 10, "Logo non trouvé", 0, 1, "C")
+        pdf.ln(25)
+        pdf.cell(0, 10, firm.service.upper(), 0, 1, "C")
 
-        pdf.ln(28)
+        pdf.ln(1)
         rect_width = pdf.w / 3
         rect_height = 4
         y_position = pdf.get_y()
