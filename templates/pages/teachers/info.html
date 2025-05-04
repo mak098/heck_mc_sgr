@@ -22,6 +22,8 @@
                     <th>noms</th>
                     <th>Section</th>
                     <th>promotion</th>
+                    <th>Payement</th>
+                    <th>Percu</th>
                     
                   </tr>
                 </thead>
@@ -99,6 +101,10 @@
             "<td>" + (aff.student || '') + "</td>" +
             "<td>" + (aff.section__sigle || '') + "</td>" +
             "<td>" + (aff.promotion__code || '') + "</td>" +
+            "<td>" + (aff.management_fees != null ? aff.management_fees.toFixed(2) : '') + "</td>" +
+"<td>" + (aff.teacher_amount_collected != null ? aff.teacher_amount_collected.toFixed(2) : '') + "</td>"
++
+
         "</tr>"
     );
 });

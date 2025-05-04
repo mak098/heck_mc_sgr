@@ -92,7 +92,16 @@ def get_students_by_teacher(request):
 
     teacher = Teacher.objects.get(id=teacher_id)
     academic = AcademicYear.objects.get(is_current=True)
-    affectations = Affectation.objects.filter(teacher=teacher,academic_year=academic).values("id","student","matricule","type")
+    affectations = Affectation.objects.filter(
+        teacher=teacher, academic_year=academic
+    ).values(
+        "id",
+        "student",
+        "matricule",
+        "type",
+        "management_fees",
+        "teacher_amount_collected",
+    )
     if teacher_id:       
         return JsonResponse({"affectations": list(affectations)})
 
