@@ -186,8 +186,10 @@ class ExportPdf(viewsets.ModelViewSet):
 
         pdf.cell(15, 8, "Num", 1, 0, "C", fill=True)  # Largeur ajustée
         pdf.cell(60, 8, "Noms", 1, 0, "C", fill=True)  # Largeur ajustée
-        pdf.cell(45, 8, "Section", 1, 0, "C", fill=True)  # Largeur ajustée
-        pdf.cell(45, 8, "Promotion", 1, 0, "C", fill=True)
+        pdf.cell(30, 8, "Section", 1, 0, "C", fill=True)  # Largeur ajustée
+        pdf.cell(30, 8, "Promotion", 1, 0, "C", fill=True)
+        pdf.cell(30, 8, "Payement", 1, 0, "C", fill=True)
+        pdf.cell(30, 8, "Percu", 1, 0, "C", fill=True)
         pdf.ln(8)
         i = 0
         pdf.set_text_color(0, 0, 0)
@@ -195,8 +197,19 @@ class ExportPdf(viewsets.ModelViewSet):
             i=i+1
             pdf.cell(15, 8, f"{str(i)}", 1, 0, "L")
             pdf.cell(60, 8, aff.student, 1, 0, "L")
-            pdf.cell(45, 8, aff.section.sigle, 1, 0, "L")
-            pdf.cell(45, 8, aff.promotion.code if aff.promotion else "N/A", 1, 1, "L")        
+            pdf.cell(30, 8, aff.section.sigle, 1, 0, "L")
+            pdf.cell(30, 8, aff.promotion.code if aff.promotion else "N/A", 1, 0, "L")        
+            pdf.cell(
+                30, 8, aff.management_fees if aff.management_fees else "0.00", 1, 0, "L"
+            )
+            pdf.cell(
+                30,
+                8,
+                str(aff.teacher_amount_collected) if aff.teacher_amount_collected else "0.00",
+                1,
+                1,
+                "L",
+            )
 
         pdf.ln(5)
 
