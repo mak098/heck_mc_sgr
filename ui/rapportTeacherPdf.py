@@ -30,7 +30,7 @@ class CustomPDF(FPDF):
         self.cell(0, 10, f"Page {self.page_no()}", 0, 0, "C")
 
 class ExportPdf(viewsets.ModelViewSet):
-    def getTeacherStudent(self,year,teacher):
+    def getTeacherStudent(self, year, teacher):
         try:
             if year == "current":
                 academic = AcademicYear.objects.get(is_current=True)
@@ -43,69 +43,40 @@ class ExportPdf(viewsets.ModelViewSet):
         if not firm:
             return HttpResponse("Aucune entreprise trouvée", status=404)
 
-        pdf = CustomPDF(orientation="P")  # Mode paysage
+        pdf = CustomPDF(orientation="P")  # Portrait
         pdf.add_page()
 
-        # Titre principal
         pdf.set_font("Arial", "B", 14)
         pdf.cell(0, 10, "Republique democratique du Congo".upper(), 0, 1, "C")
 
-        # Sous-titre
         pdf.set_text_color(0, 0, 255)
         pdf.set_font("Arial", "B", 10)
-        pdf.cell(
-            0,
-            2,
-            "Ministère de l'Enseignement Supérieur et Universitaire".upper(),
-            0,
-            1,
-            "C",
-        )
+        pdf.cell(0, 2, "Ministère de l'Enseignement Supérieur et Universitaire".upper(), 0, 1, "C")
 
-        # Nom de l'entreprise
         pdf.set_text_color(0, 0, 0)
         pdf.set_font("Arial", "B", 10)
         pdf.cell(0, 10, firm.name, 0, 1, "C")
         pdf.cell(0, 10, firm.service, 0, 1, "C")
 
-        # Logo sous le nom de l'entreprise avec un interligne de 10
-        pdf.ln(1)  # Interligne de 10
+        pdf.ln(1)
         logo_path = "media/" + str(firm.logo)
         if os.path.exists(logo_path):
-            pdf.image(
-                logo_path,
-                x=(pdf.w / 2 - 12.5),
-                y=pdf.get_y(),
-                w=25,
-                h=25,
-                type="",
-                link="",
-            )  # Centrer le logo
+            pdf.image(logo_path, x=(pdf.w / 2 - 12.5), y=pdf.get_y(), w=25, h=25)
         else:
             pdf.cell(0, 10, "Logo non trouvé", 0, 1, "C")
 
-        # Trois barres sous le logo avec un interligne de 10
-        pdf.ln(28)  # Interligne de 10
-        rect_width = (
-            pdf.w / 3
-        )  # Largeur de chaque rectangle (1/3 de la largeur de la page)
-        rect_height = 4  # Hauteur des rectangles
-        y_position = pdf.get_y()  # Position Y après le logo et l'interligne
-
-        # Rectangle rouge
+        pdf.ln(28)
+        rect_width = pdf.w / 3
+        rect_height = 4
+        y_position = pdf.get_y()
         pdf.set_fill_color(255, 0, 0)
         pdf.rect(x=0, y=y_position, w=rect_width, h=rect_height, style="FD")
-
-        # Rectangle jaune
         pdf.set_fill_color(255, 255, 0)
         pdf.rect(x=rect_width, y=y_position, w=rect_width, h=rect_height, style="FD")
-
-        # Rectangle bleu
         pdf.set_fill_color(0, 0, 255)
-        pdf.rect(
-            x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD"
-        )
+        pdf.rect(x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD")
         pdf.ln(10)
+
         _teacher = Teacher.objects.get(id=teacher)
 
         pdf.set_font("Arial", "", 10)
@@ -115,105 +86,84 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf.cell(30, 4, "Matricule :", 0, 0, "L")
         pdf.cell(40, 4, _teacher.matricule, 0, 1, "L")
         pdf.ln(3)
-
-        # Noms
         pdf.cell(30, 4, "Noms :", 0, 0, "L")
-        pdf.cell(
-            40,
-            4,
-            f"{_teacher.first_name} {_teacher.last_name} {_teacher.name}",
-            0,
-            1,
-            "L",
-        )
+        pdf.cell(40, 4, f"{_teacher.first_name} {_teacher.last_name} {_teacher.name}", 0, 1, "L")
         pdf.ln(3)
 
-        # ========== NOUVEAU TABLEAU RECAPITULATIF ==========
-        # Récupérer les données récapitulatives
-        affectations = Affectation.objects.filter(
-            academic_year=academic, teacher=teacher
-        )
-        summary = (
-            affectations.values(
-             
-                "section__sigle",
-                "promotion__code",
-            )
-            .annotate(total=Count("id"))
-            .order_by(
-                "section__sigle",
-                "promotion__code",
-            )
-        )
-
-        # Calculer le total général
+        affectations = Affectation.objects.filter(academic_year=academic, teacher=teacher)
+        summary = affectations.values("section__sigle", "promotion__code").annotate(total=Count("id")).order_by("section__sigle", "promotion__code")
         total_general = affectations.count()
 
-        # En-tête du tableau récapitulatif
         pdf.set_font("Arial", "B", 9)
         pdf.cell(0, 8, "Récapitulatif par promotion", 0, 1, "L")
-
-        pdf.set_fill_color(200, 200, 200)  # Gris clair
+        pdf.set_fill_color(200, 200, 200)
         pdf.set_text_color(0, 0, 0)
         pdf.cell(55, 8, "Section", 1, 0, "C", fill=True)
         pdf.cell(45, 8, "Promotion", 1, 0, "C", fill=True)
         pdf.cell(30, 8, "Nb Étudiants", 1, 1, "C", fill=True)
 
-        # Données du récapitulatif
         pdf.set_fill_color(255, 255, 255)
         for item in summary:
-            section_sigle = item["section__sigle"] if item["section__sigle"] else "N/A"
-            promotion_code = item["promotion__code"] if item["promotion__code"] else "N/A"
+            section_sigle = item["section__sigle"] or "N/A"
+            promotion_code = item["promotion__code"] or "N/A"
             pdf.cell(55, 8, section_sigle, 1, 0, "L")
             pdf.cell(45, 8, promotion_code, 1, 0, "L")
             pdf.cell(30, 8, str(item["total"]), 1, 1, "L")
 
-        # Ligne du total général
-        pdf.set_fill_color(220, 220, 220)  # Gris un peu plus foncé
+        pdf.set_fill_color(220, 220, 220)
         pdf.cell(100, 8, "TOTAL GENERAL", 1, 0, "R", fill=True)
         pdf.cell(30, 8, str(total_general), 1, 1, "R", fill=True)
-        pdf.ln(5)  # Espace avant le tableau principal
+        pdf.ln(5)
 
         pdf.set_font("Arial", "B", 12)
         pdf.set_text_color(0, 0, 0)
         pdf.cell(0, 10, f"Etudiants", 0, 1)
-        pdf.set_text_color(0, 0, 0)
 
-        # En-tête du tableau avec fond noir
-        pdf.set_fill_color(0, 0, 0)  # Noir
-        pdf.set_text_color(255, 255, 255)  # Blanc
+        pdf.set_fill_color(0, 0, 0)
+        pdf.set_text_color(255, 255, 255)
         pdf.set_font("Arial", "B", 9)
-
-        pdf.cell(15, 8, "Num", 1, 0, "C", fill=True)  # Largeur ajustée
-        pdf.cell(60, 8, "Noms", 1, 0, "C", fill=True)  # Largeur ajustée
-        pdf.cell(30, 8, "Section", 1, 0, "C", fill=True)  # Largeur ajustée
+        pdf.cell(15, 8, "Num", 1, 0, "C", fill=True)
+        pdf.cell(60, 8, "Noms", 1, 0, "C", fill=True)
+        pdf.cell(30, 8, "Section", 1, 0, "C", fill=True)
         pdf.cell(30, 8, "Promotion", 1, 0, "C", fill=True)
         pdf.cell(30, 8, "Payement", 1, 0, "C", fill=True)
-        pdf.cell(30, 8, "Percu", 1, 0, "C", fill=True)
-        pdf.ln(8)
+        pdf.cell(30, 8, "Percu", 1, 1, "C", fill=True)
+
         i = 0
+        total_management_fees = 0.0
+        total_teacher_collected = 0.0
         pdf.set_text_color(0, 0, 0)
+
         for aff in affectations:
-            i=i+1
-            pdf.cell(15, 8, f"{str(i)}", 1, 0, "L")
+            i += 1
+            m_fees = float(aff.management_fees) if aff.management_fees else 0.0
+            t_collected = float(aff.teacher_amount_collected) if aff.teacher_amount_collected else 0.0
+            total_management_fees += m_fees
+            total_teacher_collected += t_collected
+
+            pdf.cell(15, 8, str(i), 1, 0, "L")
             pdf.cell(60, 8, aff.student, 1, 0, "L")
             pdf.cell(30, 8, aff.section.sigle, 1, 0, "L")
-            pdf.cell(30, 8, aff.promotion.code if aff.promotion else "N/A", 1, 0, "L")        
-            pdf.cell(
-                30, 8, aff.management_fees if aff.management_fees else "0.00", 1, 0, "L"
-            )
-            pdf.cell(
-                30,
-                8,
-                str(aff.teacher_amount_collected) if aff.teacher_amount_collected else "0.00",
-                1,
-                1,
-                "L",
-            )
+            pdf.cell(30, 8, aff.promotion.code if aff.promotion else "N/A", 1, 0, "L")
+            pdf.cell(30, 8, f"{m_fees:.2f}", 1, 0, "R")
+            pdf.cell(30, 8, f"{t_collected:.2f}", 1, 1, "R")
 
-        pdf.ln(5)
+        # Ligne des totaux
+        pdf.set_font("Arial", "B", 9)
+        pdf.set_fill_color(230, 230, 230)
+        pdf.cell(135, 8, "TOTAL", 1, 0, "R", fill=True)
+        pdf.cell(30, 8, f"{total_management_fees:.2f}", 1, 0, "R", fill=True)
+        pdf.cell(30, 8, f"{total_teacher_collected:.2f}", 1, 1, "R", fill=True)
 
-        # Sauvegarder le PDF dans un fichier temporaire
+        # Ligne du disponible
+        disponible = total_management_fees - total_teacher_collected
+        pdf.set_fill_color(200, 255, 200)
+        pdf.set_text_color(0, 100, 0)
+        pdf.set_font("Arial", "B", 9)
+        pdf.cell(135, 8, "DISPONIBLE", 1, 0, "R", fill=True)
+        pdf.cell(60, 8, f"{disponible:.2f}", 1, 1, "R", fill=True)
+
+        # Générer le PDF
         pdf_buffer = BytesIO()
         pdf.output(pdf_buffer, dest="S")
         pdf_buffer.seek(0)
