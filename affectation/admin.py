@@ -30,6 +30,7 @@ class AffectionAdmin(admin.ModelAdmin):
         "section",
         "promotion",
         "academic_year",
+        "created_at",
     ]
 
     def section_sigle(self, obj):

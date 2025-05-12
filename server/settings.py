@@ -9,7 +9,6 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 IS_PRODUCTION = env("IS_PRODUCTION", default=False)
 DEBUG = env("DEBUG")
 
-
 SECRET_KEY = env("SECRET_KEY")
 if IS_PRODUCTION:
     ALLOWED_HOSTS = ["*"]
@@ -17,10 +16,21 @@ else:
     ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 
 # Lire CSRF_TRUSTED_ORIGINS
-CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+CSRF_TRUSTED_ORIGINS = [
+    "http://heckin.net",
+    "https://heckin.net",
+    "http://sgr.heckin.net",
+    "https://sgr.heckin.net",
+]
 
 # Lire CORS_ALLOWED_ORIGINS
-CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
+CORS_ALLOWED_ORIGINS = [
+    "http://heckin.net",
+    "https://heckin.net",
+    "http://sgr.heckin.net",
+    "https://sgr.heckin.net",
+    "http://localhost:5173",
+]
 
 # Application definition
 
