@@ -1,6 +1,12 @@
 from django.contrib import admin
 from .models import Student,AttachementFile
 from import_export.admin import ImportExportModelAdmin
+from .views import download_students_excel
+
+
+def download_student(modeladmin, request, queryset):
+    return download_students_excel(request, queryset.values())
+download_student.short_description = "telecharger les etudiant actuel"
 
 class AttachementInline(admin.TabularInline):
     model = AttachementFile
@@ -8,6 +14,7 @@ class AttachementInline(admin.TabularInline):
     extra = 0
 @admin.register(Student)
 class StudentAdmin(ImportExportModelAdmin):
+    actions = [download_student,]
     list_display = [
         "matricule",
         "names",
