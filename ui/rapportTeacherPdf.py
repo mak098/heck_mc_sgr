@@ -277,7 +277,7 @@ class ExportPdf(viewsets.ModelViewSet):
             pdf.cell(
                 0,
                 8,
-                f"{teacher.matricule} {teacher.grade}. {teacher.first_name} {teacher.last_name} {teacher.name}",
+                f"{teacher.matricule or ''} {getattr(teacher, 'grade', '') or ''}. {teacher.first_name or ''} {teacher.last_name or ''} {teacher.name or ''}",
                 0,
                 1,
                 "L",
@@ -292,10 +292,9 @@ class ExportPdf(viewsets.ModelViewSet):
             # Données du récapitulatif
             pdf.set_fill_color(255, 255, 255)
             for item in summary:
-                pdf.cell(55, 8, item["section__sigle"], 1, 0, "L")
-                pdf.cell(45, 8, item["promotion__code"], 1, 0, "L")
-                pdf.cell(30, 8, str(item["total"]), 1, 1, "R")
-
+                pdf.cell(55, 8, str(item.get("section__sigle") or ""), 1, 0, "L")
+                pdf.cell(45, 8, str(item.get("promotion__code") or ""), 1, 0, "L")
+                pdf.cell(30, 8, str(item.get("total") or ""), 1, 1, "R")
             # Ligne du total général
             pdf.set_fill_color(220, 220, 220)  # Gris un peu plus foncé
             pdf.cell(100, 8, "TOTAL GENERAL", 1, 0, "R", fill=True)
