@@ -36,8 +36,17 @@
                   class="btn btn-primary text-white me-0"
                   ><i class="icon-printer"></i> Par enseignant</a
                 >
-                <a href="#" id="print-synthese" class="btn btn-primary text-white me-0"
-                  ><i class="icon-printer"></i> Enseignants</a
+                <a
+                  href="#"
+                  id="print-synthese"
+                  class="btn btn-primary text-white me-0"
+                  ><i class="icon-printer"></i> Ens. synthetique</a
+                >
+                <a
+                  href="#"
+                  id="getAllTeacherStudent"
+                  class="btn btn-primary text-white me-0"
+                  ><i class="icon-printer"></i> Ens. detail</a
                 >
               </div>
             </div>
@@ -121,8 +130,8 @@
           window.location.href = `/download-pdf/current`;
         }
       });
-    
-      //telecharger le pdf synthetique teacher
+
+    //telecharger le pdf synthetique teacher
     document
       .getElementById("print-pdf")
       .addEventListener("click", function (event) {
@@ -142,7 +151,27 @@
           console.error("Aucun onglet actif trouvé.");
           window.location.href = `/download-pdf/current`;
         }
-      });
-  });
+    });
+    document
+      .getElementById("getAllTeacherStudent")
+      .addEventListener("click", function (event) {
+        event.preventDefault(); // Empêcher le comportement par défaut du lien
+
+        // Récupérer l'onglet actif
+        let activeTab = document.querySelector(".nav-link.active");
+
+        if (activeTab) {
+          // Récupérer l'année active
+          let activeYear = activeTab.getAttribute("data-year");
+          let teacher = document.querySelector(".teacher-choice").value;
+
+          // Rediriger vers l'URL de téléchargement du PDF avec l'année active
+          window.location.href = `/getAllTeacherStudent/${activeYear}`;
+        } else {
+          console.error("Aucun onglet actif trouvé.");
+          window.location.href = `/download-pdf/current`;
+        }
+    });
+    });
 </script>
 {% endblock page_content%}

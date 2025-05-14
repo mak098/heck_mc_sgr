@@ -52,12 +52,18 @@ urlpatterns = [
         rapportTeacherPdf.ExportPdf.getTeacherSynthese,
         name="download-teacher-synthese",
     ),
+    path(
+        "getAllTeacherStudent/<str:year>",
+        rapportTeacherPdf.ExportPdf.getAllTeacherStudent,
+        name="getAllTeacherStudent",
+    ),
     path("teacher-page/", teacher.teacher_page, name="teacher-page"),
     path(
         "teacher-get-student/",
         teacher.get_students_by_teacher,
         name="teacher-get-student",
     ),
+    
     path(
         "import-excel/",
         import_affectation.import_excel_file,
