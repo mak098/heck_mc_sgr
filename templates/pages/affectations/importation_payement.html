@@ -8,8 +8,8 @@
           <div class="col-12 grid-margin stretch-card">
             <div class="card">
               <div class="card-body">
-                <h4 class="card-title">AFFECTION</h4>
-                <p class="card-description">Importation d'un fichier excel</p>
+                <h4 class="card-title">PAYEMENT</h4>
+                <p class="card-description">importation de fichier excel</p>
                 <form class="forms-sample">
                  
                   <div class="form-group">
@@ -85,7 +85,7 @@
 
       formData.append('file', file);
 
-      fetch('/import-excel/', {  // 🔁 adapte l’URL à celle de ta vue
+      fetch('/import_payement/', {  // 🔁 adapte l’URL à celle de ta vue
         method: 'POST',
         headers: {
           'X-CSRFToken': getCookie('csrftoken')  // Important pour Django

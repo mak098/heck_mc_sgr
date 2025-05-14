@@ -36,6 +36,11 @@ urlpatterns = [
         affectations.importation_page,
         name="importation_page",
     ),
+    path(
+        "importation_payement_page",
+        affectations.importation_payement_page,
+        name="importation_payement_page",
+    ),
     path("get-students/", affectations.get_students, name="get_students"),
     path(
         "get_students_by_teacher/",
@@ -63,10 +68,14 @@ urlpatterns = [
         teacher.get_students_by_teacher,
         name="teacher-get-student",
     ),
-    
     path(
         "import-excel/",
         import_affectation.import_excel_file,
         name="import_affectation",
+    ),
+    path(
+        "import_payement/",
+        import_affectation.import_payement,
+        name="import_payement",
     ),
 ]

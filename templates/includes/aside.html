@@ -7,32 +7,7 @@
       </a>
     </li>
     <li class="nav-item nav-category">Menus</li>
-    {% comment %}<li class="nav-item">
-       <a
-        class="nav-link"
-        data-bs-toggle="collapse"
-        href="#ui-basic"
-        aria-expanded="false"
-        aria-controls="ui-basic"
-      >
-        <i class="menu-icon mdi mdi-floor-plan"></i>
-        <span class="menu-title">Orientations</span>
-        <i class="menu-arrow"></i>
-      </a>
-      <div class="collapse" id="ui-basic">
-        <ul class="nav flex-column sub-menu">
-          {% for filiere in filieres %}
-          <li class="nav-item">
-            <a
-              class="nav-link"
-              href="{% url 'filiere-students' filiere.sigle %}"
-              >{{ filiere.sigle }}</a
-            >
-          </li>
-          {% endfor %}
-        </ul>
-      </div> 
-    </li>{% endcomment %}
+ 
     <li class="nav-item">
       <a
         class="nav-link"
@@ -59,64 +34,7 @@
         </ul>
       </div>
     </li>
-    {% comment %} <li class="nav-item">
-      <a
-        class="nav-link"
-        data-bs-toggle="collapse"
-        href="#charts"
-        aria-expanded="false"
-        aria-controls="charts"
-      >
-        <i class="menu-icon mdi mdi-chart-line"></i>
-        <span class="menu-title">Rapports</span>
-        <i class="menu-arrow"></i>
-      </a>
-      <div class="collapse" id="charts">
-        <ul class="nav flex-column sub-menu">
-          <li class="nav-item">
-            <a class="nav-link" href="pages/charts/chartjs.html">ChartJs</a>
-          </li>
-        </ul>
-      </div>
-    </li> {% endcomment %}
 
-    {% comment %} <li class="nav-item">
-      <a
-        class="nav-link"
-        data-bs-toggle="collapse"
-        href="#icons"
-        aria-expanded="false"
-        aria-controls="icons"
-      >
-        <i class="menu-icon mdi mdi-layers-outline"></i>
-        <span class="menu-title">Config</span>
-        <i class="menu-arrow"></i>
-      </a>
-      <div class="collapse" id="icons">
-        <ul class="nav flex-column sub-menu">
-          <li class="nav-item">
-            <a class="nav-link" href="pages/icons/font-awesome.html"
-              >Exercices</a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="pages/icons/font-awesome.html"
-              >Orientations</a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="pages/icons/font-awesome.html"
-              >Promotions</a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="pages/icons/font-awesome.html"
-              >Utulisateurs</a
-            >
-          </li>
-        </ul>
-      </div>
-    </li> {% endcomment %}
 
     <li class="nav-item">
       <a class="nav-link" href="{% url 'teacher-page' %}">
@@ -130,11 +48,11 @@
         <span class="menu-title">Importation</span>
       </a>
     </li> 
-    {% comment %} <li class="nav-item">
-      <a class="nav-link payemnt" href="{% url 'importation_page' %}">
+    <li class="nav-item">
+      <a class="nav-link payemnt" href="{% url 'importation_payement_page' %}">
         <i class="menu-icon mdi mdi-currency-usd"></i>
         <span class="menu-title">Payement</span>
       </a>
-    </li>  {% endcomment %}
+    </li> 
   </ul>
 </nav>
