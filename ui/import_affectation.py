@@ -25,7 +25,7 @@ def import_excel_file(request):
     for row in sheet.iter_rows(min_row=2, values_only=True):
         row_data = dict(zip(headers, row))
         # try:
-        print(">>>>>>>>>>>>>>>>", row_data["teacher"])
+       
         teacher = Teacher.objects.get(matricule=row_data["teacher"])
         section = (
             Section.objects.get(id=row_data["section"])
@@ -39,17 +39,18 @@ def import_excel_file(request):
         )
         academic_year = AcademicYear.objects.get(year=row_data["academic_year"])
         matricule=row_data.get("matricule", "-")
-        if Affectation.objects.filter(teacher=teacher,matricule=matricule,academic_year=academic_year).exists():pass
-        Affectation.objects.create(
-            teacher=teacher,
-            section=section,
-            promotion=promotion,
-            student=row_data.get("names", "-"),
-            matricule=matricule,
-            academic_year=academic_year,
-            affected_by=request.user,
-        )
-        success_count += 1
+        if not Affectation.objects.filter(teacher=teacher,matricule=matricule,academic_year=academic_year).exists():
+            if not Affectation.objects.filter(matricule=matricule,academic_year=academic_year).exists():
+                Affectation.objects.create(
+                    teacher=teacher,
+                    section=section,
+                    promotion=promotion,
+                    student=row_data.get("names", "-"),
+                    matricule=matricule,
+                    academic_year=academic_year,
+                    affected_by=request.user,
+                )
+                success_count += 1
 
         # except Exception as e:
         #     errors.append({"row": row_data, "error": str(e)})
