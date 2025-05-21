@@ -1,6 +1,13 @@
 from django.contrib import admin
 from .models import AcademicYear, Section,Filiere, DocumentFolde, Promotion, Firm, Speciality
+from ui.rapportTeacherPdf import ExportPdf
 
+
+def download_affection(modeladmin, request, queryset):
+    return ExportPdf.getAllTeacherStudentBySection(request, queryset.values())
+
+
+download_affection.short_description = "telecharger les etudiant actuel"
 class FiliereInline(admin.TabularInline):
     extra = 0
     model = Filiere
@@ -41,6 +48,7 @@ class SectionAdmin(admin.ModelAdmin):
     fields = [ "name", "sigle"]
     search_fields = ["name", "sigle"]
     inlines = [FiliereInline,]
+    actions = [download_affection]  
 
 @admin.register(Filiere)
 class FiliereAdmin(admin.ModelAdmin):

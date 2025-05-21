@@ -14,6 +14,7 @@ from teachers.models import Teacher
 from affectation.models import Affectation
 from django.db.models import Count
 import asyncio
+from parameter.models import Section
 
 
 class CustomPDF(FPDF):
@@ -444,6 +445,138 @@ class ExportPdf(viewsets.ModelViewSet):
         response["Content-Disposition"] = f'attachment; filename="all_teachers_{academic.year}.pdf"'
         return response
 
+    def getAllTeacherStudentBySection(self,  sections):
+        year = "current"
+        for sec in sections:
+            section_id = Section.objects.get(id=sec['id'])
+            try:
+                if year == "current":
+                    academic = AcademicYear.objects.get(is_current=True)
+                else:
+                    academic = AcademicYear.objects.get(year=year)
+            except AcademicYear.DoesNotExist:
+                return HttpResponse("Année académique non trouvée", status=404)
+
+            firm = Firm.objects.all().first()
+            if not firm:
+                return HttpResponse("Aucune entreprise trouvée", status=404)
+
+            pdf = CustomPDF(orientation="P")
+            pdf.add_page()
+
+            pdf.set_font("Arial", "B", 14)
+            pdf.cell(0, 10, "Republique democratique du Congo".upper(), 0, 1, "C")
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(0, 2, "Ministère de l'Enseignement Supérieur et Universitaire".upper(), 0, 1, "C")
+
+            pdf.set_text_color(0, 0, 0)
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(0, 10, firm.name, 0, 1, "C")
+
+            logo_path = "media/" + str(firm.logo)
+            if os.path.exists(logo_path):
+                pdf.image(logo_path, x=(pdf.w / 2 - 12.5), y=pdf.get_y(), w=25, h=25)
+            else:
+                pdf.cell(0, 10, "Logo non trouvé", 0, 1, "C")
+            pdf.ln(25)
+            pdf.cell(0, 10, firm.service.upper(), 0, 1, "C")
+
+            pdf.ln(1)
+            rect_width = pdf.w / 3
+            rect_height = 4
+            y_position = pdf.get_y()
+            pdf.set_fill_color(255, 0, 0)
+            pdf.rect(x=0, y=y_position, w=rect_width, h=rect_height, style="FD")
+            pdf.set_fill_color(255, 255, 0)
+            pdf.rect(x=rect_width, y=y_position, w=rect_width, h=rect_height, style="FD")
+            pdf.set_fill_color(0, 0, 255)
+            pdf.rect(x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD")
+            pdf.ln(10)
+
+            # Filtrer les enseignants qui ont des affectations dans cette section
+            teachers = Teacher.objects.filter(
+                affectations_teacher_set__academic_year=academic,
+                affectations_teacher_set__section_id=section_id,
+            ).distinct()
+
+            for _teacher in teachers:
+                pdf.set_font("Arial", "B", 12)
+                pdf.set_text_color(0, 0, 0)
+                pdf.cell(0, 10, f"Enseignant : {(_teacher.first_name or '')} {(_teacher.last_name or '')} {(_teacher.name or '')}", 0, 1, "L")
+                pdf.set_font("Arial", "", 10)
+                pdf.cell(30, 4, "Grade :", 0, 0, "L")
+                pdf.cell(40, 4, str(getattr(_teacher.grade, 'grade', '')), 0, 1, "L")
+                pdf.ln(3)
+                pdf.cell(30, 4, "Matricule :", 0, 0, "L")
+                pdf.cell(40, 4, str(_teacher.matricule or ""), 0, 1, "L")
+                pdf.ln(3)
+
+                affectations = Affectation.objects.filter(
+                    academic_year=academic,
+                    teacher=_teacher,
+                    section_id=section_id
+                )
+                if not affectations.exists():
+                    pdf.cell(0, 8, "Aucune affectation pour cet enseignant dans cette section.", 0, 1, "L")
+                    pdf.ln(5)
+                    continue
+
+                pdf.set_font("Arial", "B", 12)
+                pdf.set_text_color(0, 0, 0)
+                pdf.cell(0, 10, f"Etudiants", 0, 1)
+
+                pdf.set_fill_color(0, 0, 0)
+                pdf.set_text_color(255, 255, 255)
+                pdf.set_font("Arial", "B", 9)
+                pdf.cell(15, 8, "Num", 1, 0, "C", fill=True)
+                pdf.cell(60, 8, "Noms", 1, 0, "C", fill=True)
+                pdf.cell(30, 8, "Section", 1, 0, "C", fill=True)
+                pdf.cell(30, 8, "Promotion", 1, 0, "C", fill=True)
+                pdf.cell(30, 8, "Payement", 1, 0, "C", fill=True)
+                pdf.cell(30, 8, "Percu", 1, 1, "C", fill=True)
+
+                i = 0
+                total_management_fees = 0.0
+                total_teacher_collected = 0.0
+                pdf.set_text_color(0, 0, 0)
+
+                for aff in affectations:
+                    i += 1
+                    m_fees = float(aff.management_fees) if aff.management_fees else 0.0
+                    t_collected = float(aff.teacher_amount_collected) if aff.teacher_amount_collected else 0.0
+                    total_management_fees += m_fees
+                    total_teacher_collected += t_collected
+
+                    pdf.cell(15, 8, str(i), 1, 0, "L")
+                    pdf.cell(60, 8, remove_non_ascii(aff.student), 1, 0, "L")
+                    pdf.cell(30, 8, remove_non_ascii(getattr(aff.section, 'sigle', '')), 1, 0, "L")
+                    pdf.cell(30, 8, remove_non_ascii(getattr(aff.promotion, 'code', 'N/A')), 1, 0, "L")
+                    pdf.cell(30, 8, f"{m_fees:.2f}", 1, 0, "R")
+                    pdf.cell(30, 8, f"{t_collected:.2f}", 1, 1, "R")
+                # Ligne des totaux
+                pdf.set_font("Arial", "B", 9)
+                pdf.set_fill_color(230, 230, 230)
+                pdf.cell(135, 8, "TOTAL", 1, 0, "R", fill=True)
+                pdf.cell(30, 8, f"{total_management_fees:.2f}", 1, 0, "R", fill=True)
+                pdf.cell(30, 8, f"{total_teacher_collected:.2f}", 1, 1, "R", fill=True)
+
+                # Ligne du disponible
+                disponible = total_management_fees - total_teacher_collected
+                pdf.set_fill_color(200, 255, 200)
+                pdf.set_text_color(0, 100, 0)
+                pdf.set_font("Arial", "B", 9)
+                pdf.cell(135, 8, "DISPONIBLE", 1, 0, "R", fill=True)
+                pdf.cell(60, 8, f"{disponible:.2f}", 1, 1, "R", fill=True)
+                pdf.ln(10)
+
+            # Générer le PDF
+        pdf_buffer = BytesIO()
+        pdf.output(pdf_buffer, dest="S")
+        pdf_buffer.seek(0)
+
+        response = HttpResponse(pdf_buffer, content_type="application/pdf")
+        response["Content-Disposition"] = f'attachment; filename="teachers_section_{section_id}_{academic.year}.pdf"'
+        return response
 import unicodedata
 
 
