@@ -87,11 +87,10 @@ def import_payement(request):
         matricule=row_data.get("matricule", "-")
         if Affectation.objects.filter(matricule=matricule,academic_year=academic_year).exists():
             affectation = Affectation.objects.get(matricule=matricule,academic_year=academic_year)
-            if affectation.deposit_fees == 0.00:
-                affectation.deposit_fees = row_data.get("deposit_fees", 0.00)
-                affectation.management_fees = row_data.get("management_fees", 0.00)
-                affectation.save()
-                success_count += 1
+           
+            affectation.management_fees = row_data.get("management_fees", 0.00)
+            affectation.save()
+            success_count += 1
         
     return JsonResponse(
         {
