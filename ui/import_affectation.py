@@ -86,7 +86,7 @@ def import_payement(request):
         academic_year = AcademicYear.objects.get(year=row_data["academic_year"])
         matricule=row_data.get("matricule", "-")
         if Affectation.objects.filter(matricule=matricule,academic_year=academic_year).exists():
-            affectation = Affectation.objects.get(matricule=matricule,academic_year=academic_year)
+            affectation = Affectation.objects.get(matricule=matricule,academic_year=academic_year).first()
            
             affectation.management_fees = row_data.get("management_fees", 0.00)
             affectation.save()
