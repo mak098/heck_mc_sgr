@@ -76,22 +76,25 @@ def import_payement(request):
     # try:
     workbook = openpyxl.load_workbook(excel_file)
     sheet = workbook.active
-    headers = [cell.value.strip().lower() for cell in sheet[1]]
+    headers = [
+        (cell.value.strip().lower() if cell.value is not None else "")
+        for cell in sheet[1]
+    ]
     success_count = 0
     errors = []
 
     for row in sheet.iter_rows(min_row=2, values_only=True):
         row_data = dict(zip(headers, row))
-              
+
         academic_year = AcademicYear.objects.get(year=row_data["academic_year"])
         matricule=row_data.get("matricule", "-")
         if Affectation.objects.filter(matricule=matricule,academic_year=academic_year).exists():
             affectation = Affectation.objects.filter(matricule=matricule,academic_year=academic_year).first()
-           
+
             affectation.management_fees = row_data.get("management_fees", 0.00)
             affectation.save()
             success_count += 1
-        
+
     return JsonResponse(
         {
             "message": f"{success_count} affectations importées avec succès.",
