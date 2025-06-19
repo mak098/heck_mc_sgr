@@ -48,6 +48,12 @@
                   class="btn btn-primary text-white me-0"
                   ><i class="icon-printer"></i> Ens. detail</a
                 >
+                <a
+                  href="#"
+                  id="getAllTeacherPayementSynthese"
+                  class="btn btn-primary text-white me-0"
+                  ><i class="icon-printer"></i> Ens. Synthese</a
+                >
               </div>
             </div>
           </div>
@@ -167,6 +173,26 @@
 
           // Rediriger vers l'URL de téléchargement du PDF avec l'année active
           window.location.href = `/getAllTeacherStudent/${activeYear}`;
+        } else {
+          console.error("Aucun onglet actif trouvé.");
+          window.location.href = `/download-pdf/current`;
+        }
+    });
+    document
+      .getElementById("getAllTeacherPayementSynthese")
+      .addEventListener("click", function (event) {
+        event.preventDefault(); // Empêcher le comportement par défaut du lien
+
+        // Récupérer l'onglet actif
+        let activeTab = document.querySelector(".nav-link.active");
+
+        if (activeTab) {
+          // Récupérer l'année active
+          let activeYear = activeTab.getAttribute("data-year");
+          let teacher = document.querySelector(".teacher-choice").value;
+
+          // Rediriger vers l'URL de téléchargement du PDF avec l'année active
+          window.location.href = `/download-teachers-synthese-paiement/${activeYear}`;
         } else {
           console.error("Aucun onglet actif trouvé.");
           window.location.href = `/download-pdf/current`;

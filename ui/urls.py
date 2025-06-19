@@ -58,6 +58,11 @@ urlpatterns = [
         name="download-teacher-synthese",
     ),
     path(
+        "download-teachers-synthese-paiement/<str:year>",
+        rapportTeacherPdf.ExportPdf.getAllTeacherPayementSynthese,
+        name="getAllTeacherPayementSynthese",
+    ),
+    path(
         "getAllTeacherStudent/<str:year>",
         rapportTeacherPdf.ExportPdf.getAllTeacherStudent,
         name="getAllTeacherStudent",
