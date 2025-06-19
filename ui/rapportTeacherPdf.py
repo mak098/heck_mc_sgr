@@ -634,7 +634,9 @@ class ExportPdf(viewsets.ModelViewSet):
 
         # Titre du rapport synthèse
         pdf.set_font("Arial", "B", 12)
-        pdf.cell(0, 10, "Synthèse Paiement Enseignants", 0, 1, "C")
+        pdf.cell(
+            0, 10, "État de Paiement des Enseignants du Programme Tutoré", 0, 1, "C"
+        )
         pdf.ln(5)
 
         # En-tête du tableau
