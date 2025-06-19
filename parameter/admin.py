@@ -5,9 +5,12 @@ from ui.rapportTeacherPdf import ExportPdf
 
 def download_affection(modeladmin, request, queryset):
     return ExportPdf.getAllTeacherStudentBySection(request, queryset.values())
+def download_affection_sythese(modeladmin, request, queryset):
+    return ExportPdf.getAllTeacherPayementSyntheseBySection(request, queryset.values())
 
 
 download_affection.short_description = "telecharger les etudiant actuel"
+download_affection_sythese.short_description = "telecharger synthese paiement"
 class FiliereInline(admin.TabularInline):
     extra = 0
     model = Filiere
@@ -48,7 +51,7 @@ class SectionAdmin(admin.ModelAdmin):
     fields = [ "name", "sigle"]
     search_fields = ["name", "sigle"]
     inlines = [FiliereInline,]
-    actions = [download_affection]  
+    actions = [download_affection,download_affection_sythese]  
 
 @admin.register(Filiere)
 class FiliereAdmin(admin.ModelAdmin):
