@@ -647,7 +647,7 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf.cell(30, 8, "Perçu", 1, 0, "C", fill=True)
         pdf.cell(30, 8, "Solde", 1, 1, "C", fill=True)
 
-        teachers = Teacher.objects.all()
+        teachers = Teacher.objects.all().order_by("-grade")
         pdf.set_font("Arial", "", 10)
         pdf.set_text_color(0, 0, 0)
         total_due = 0.0
