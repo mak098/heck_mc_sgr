@@ -30,6 +30,7 @@ class CustomPDF(FPDF):
 
         self.cell(0, 10, f"Page {self.page_no()}", 0, 0, "C")
 
+
 class ExportPdf(viewsets.ModelViewSet):
     def getTeacherStudent(self, year, teacher):
         try:
@@ -50,7 +51,14 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf.set_font("Arial", "B", 14)
         pdf.cell(0, 10, "Republique democratique du Congo".upper(), 0, 1, "C")
         pdf.set_font("Arial", "B", 10)
-        pdf.cell(0, 2, "Ministère de l'Enseignement Supérieur et Universitaire".upper(), 0, 1, "C")
+        pdf.cell(
+            0,
+            2,
+            "Ministère de l'Enseignement Supérieur et Universitaire".upper(),
+            0,
+            1,
+            "C",
+        )
 
         pdf.set_text_color(0, 0, 0)
         pdf.set_font("Arial", "B", 10)
@@ -73,7 +81,9 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf.set_fill_color(255, 255, 0)
         pdf.rect(x=rect_width, y=y_position, w=rect_width, h=rect_height, style="FD")
         pdf.set_fill_color(0, 0, 255)
-        pdf.rect(x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD")
+        pdf.rect(
+            x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD"
+        )
         pdf.ln(10)
 
         _teacher = Teacher.objects.get(id=teacher)
@@ -86,11 +96,24 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf.cell(40, 4, _teacher.matricule, 0, 1, "L")
         pdf.ln(3)
         pdf.cell(30, 4, "Noms :", 0, 0, "L")
-        pdf.cell(40, 4, f"{_teacher.first_name} {_teacher.last_name} {_teacher.name}", 0, 1, "L")
+        pdf.cell(
+            40,
+            4,
+            f"{_teacher.first_name} {_teacher.last_name} {_teacher.name}",
+            0,
+            1,
+            "L",
+        )
         pdf.ln(3)
 
-        affectations = Affectation.objects.filter(academic_year=academic, teacher=teacher)
-        summary = affectations.values("section__sigle", "promotion__code").annotate(total=Count("id")).order_by("section__sigle", "promotion__code")
+        affectations = Affectation.objects.filter(
+            academic_year=academic, teacher=teacher
+        )
+        summary = (
+            affectations.values("section__sigle", "promotion__code")
+            .annotate(total=Count("id"))
+            .order_by("section__sigle", "promotion__code")
+        )
         total_general = affectations.count()
 
         pdf.set_font("Arial", "B", 9)
@@ -136,7 +159,11 @@ class ExportPdf(viewsets.ModelViewSet):
         for aff in affectations:
             i += 1
             m_fees = float(aff.management_fees) if aff.management_fees else 0.0
-            t_collected = float(aff.teacher_amount_collected) if aff.teacher_amount_collected else 0.0
+            t_collected = (
+                float(aff.teacher_amount_collected)
+                if aff.teacher_amount_collected
+                else 0.0
+            )
             total_management_fees += m_fees
             total_teacher_collected += t_collected
 
@@ -168,11 +195,13 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf_buffer.seek(0)
 
         response = HttpResponse(pdf_buffer, content_type="application/pdf")
-        response["Content-Disposition"] = f'attachment; filename="{_teacher.first_name}.pdf"'
+        response["Content-Disposition"] = (
+            f'attachment; filename="{_teacher.first_name}.pdf"'
+        )
         return response
 
     # returner le rapport pour chaque prof
-    def getTeacherSynthese(self,year):
+    def getTeacherSynthese(self, year):
         try:
             if year == "current":
                 academic = AcademicYear.objects.get(is_current=True)
@@ -265,7 +294,6 @@ class ExportPdf(viewsets.ModelViewSet):
                 .annotate(total=Count("id"))
                 .order_by(
                     "section__sigle",
-                  
                     "promotion__code",
                 )
             )
@@ -301,7 +329,7 @@ class ExportPdf(viewsets.ModelViewSet):
             pdf.cell(100, 8, "TOTAL GENERAL", 1, 0, "R", fill=True)
             pdf.cell(30, 8, str(total_general), 1, 1, "R", fill=True)
 
-            pdf.ln(5)  
+            pdf.ln(5)
 
         pdf.set_font("Arial", "B", 10)
         pdf.cell(
@@ -319,9 +347,7 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf_buffer.seek(0)
 
         response = HttpResponse(pdf_buffer, content_type="application/pdf")
-        response["Content-Disposition"] = (
-            f'attachment; filename="{academic.year}.pdf"'
-        )
+        response["Content-Disposition"] = f'attachment; filename="{academic.year}.pdf"'
         return response
 
     def getAllTeacherStudent(self, year):
@@ -343,7 +369,14 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf.set_font("Arial", "B", 14)
         pdf.cell(0, 10, "Republique democratique du Congo".upper(), 0, 1, "C")
         pdf.set_font("Arial", "B", 10)
-        pdf.cell(0, 2, "Ministère de l'Enseignement Supérieur et Universitaire".upper(), 0, 1, "C")
+        pdf.cell(
+            0,
+            2,
+            "Ministère de l'Enseignement Supérieur et Universitaire".upper(),
+            0,
+            1,
+            "C",
+        )
 
         pdf.set_text_color(0, 0, 0)
         pdf.set_font("Arial", "B", 10)
@@ -366,23 +399,34 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf.set_fill_color(255, 255, 0)
         pdf.rect(x=rect_width, y=y_position, w=rect_width, h=rect_height, style="FD")
         pdf.set_fill_color(0, 0, 255)
-        pdf.rect(x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD")
+        pdf.rect(
+            x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD"
+        )
         pdf.ln(10)
 
         teachers = Teacher.objects.all()
         for _teacher in teachers:
             pdf.set_font("Arial", "B", 12)
             pdf.set_text_color(0, 0, 0)
-            pdf.cell(0, 10, f"Enseignant : {(_teacher.first_name or '')} {(_teacher.last_name or '')} {(_teacher.name or '')}", 0, 1, "L")
+            pdf.cell(
+                0,
+                10,
+                f"Enseignant : {(_teacher.first_name or '')} {(_teacher.last_name or '')} {(_teacher.name or '')}",
+                0,
+                1,
+                "L",
+            )
             pdf.set_font("Arial", "", 10)
             pdf.cell(30, 4, "Grade :", 0, 0, "L")
-            pdf.cell(40, 4, str(getattr(_teacher.grade, 'grade', '')), 0, 1, "L")
+            pdf.cell(40, 4, str(getattr(_teacher.grade, "grade", "")), 0, 1, "L")
             pdf.ln(3)
             pdf.cell(30, 4, "Matricule :", 0, 0, "L")
             pdf.cell(40, 4, str(_teacher.matricule or ""), 0, 1, "L")
             pdf.ln(3)
 
-            affectations = Affectation.objects.filter(academic_year=academic, teacher=_teacher)
+            affectations = Affectation.objects.filter(
+                academic_year=academic, teacher=_teacher
+            )
             if not affectations.exists():
                 pdf.cell(0, 8, "Aucune affectation pour cet enseignant.", 0, 1, "L")
                 pdf.ln(5)
@@ -410,14 +454,20 @@ class ExportPdf(viewsets.ModelViewSet):
             for aff in affectations:
                 i += 1
                 m_fees = float(aff.management_fees) if aff.management_fees else 0.0
-                t_collected = float(aff.teacher_amount_collected) if aff.teacher_amount_collected else 0.0
+                t_collected = (
+                    float(aff.teacher_amount_collected)
+                    if aff.teacher_amount_collected
+                    else 0.0
+                )
                 total_management_fees += m_fees
                 total_teacher_collected += t_collected
 
                 pdf.cell(15, 8, str(i), 1, 0, "L")
                 pdf.cell(60, 8, aff.student, 1, 0, "L")
                 pdf.cell(30, 8, aff.section.sigle, 1, 0, "L")
-                pdf.cell(30, 8, aff.promotion.code if aff.promotion else "N/A", 1, 0, "L")
+                pdf.cell(
+                    30, 8, aff.promotion.code if aff.promotion else "N/A", 1, 0, "L"
+                )
                 pdf.cell(30, 8, f"{m_fees:.2f}", 1, 0, "R")
                 pdf.cell(30, 8, f"{t_collected:.2f}", 1, 1, "R")
             # Ligne des totaux
@@ -442,13 +492,15 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf_buffer.seek(0)
 
         response = HttpResponse(pdf_buffer, content_type="application/pdf")
-        response["Content-Disposition"] = f'attachment; filename="all_teachers_{academic.year}.pdf"'
+        response["Content-Disposition"] = (
+            f'attachment; filename="all_teachers_{academic.year}.pdf"'
+        )
         return response
 
-    def getAllTeacherStudentBySection(self,  sections):
+    def getAllTeacherStudentBySection(self, sections):
         year = "current"
         for sec in sections:
-            section_id = Section.objects.get(id=sec['id'])
+            section_id = Section.objects.get(id=sec["id"])
             try:
                 if year == "current":
                     academic = AcademicYear.objects.get(is_current=True)
@@ -467,7 +519,14 @@ class ExportPdf(viewsets.ModelViewSet):
             pdf.set_font("Arial", "B", 14)
             pdf.cell(0, 10, "Republique democratique du Congo".upper(), 0, 1, "C")
             pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 2, "Ministère de l'Enseignement Supérieur et Universitaire".upper(), 0, 1, "C")
+            pdf.cell(
+                0,
+                2,
+                "Ministère de l'Enseignement Supérieur et Universitaire".upper(),
+                0,
+                1,
+                "C",
+            )
 
             pdf.set_text_color(0, 0, 0)
             pdf.set_font("Arial", "B", 10)
@@ -488,14 +547,16 @@ class ExportPdf(viewsets.ModelViewSet):
             pdf.set_fill_color(255, 0, 0)
             pdf.rect(x=0, y=y_position, w=rect_width, h=rect_height, style="FD")
             pdf.set_fill_color(255, 255, 0)
-            pdf.rect(x=rect_width, y=y_position, w=rect_width, h=rect_height, style="FD")
+            pdf.rect(
+                x=rect_width, y=y_position, w=rect_width, h=rect_height, style="FD"
+            )
             pdf.set_fill_color(0, 0, 255)
-            pdf.rect(x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD")
+            pdf.rect(
+                x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD"
+            )
             pdf.ln(10)
 
-            pdf.cell(
-                0, 10, f"{section_id.name}", 0, 1, "C"
-            )
+            pdf.cell(0, 10, f"{section_id.name}", 0, 1, "C")
 
             # Filtrer les enseignants qui ont des affectations dans cette section
             teachers = Teacher.objects.filter(
@@ -506,22 +567,34 @@ class ExportPdf(viewsets.ModelViewSet):
             for _teacher in teachers:
                 pdf.set_font("Arial", "B", 12)
                 pdf.set_text_color(0, 0, 0)
-                pdf.cell(0, 10, f"Enseignant : {(_teacher.first_name or '')} {(_teacher.last_name or '')} {(_teacher.name or '')}", 0, 1, "L")
+                pdf.cell(
+                    0,
+                    10,
+                    f"Enseignant : {(_teacher.first_name or '')} {(_teacher.last_name or '')} {(_teacher.name or '')}",
+                    0,
+                    1,
+                    "L",
+                )
                 pdf.set_font("Arial", "", 10)
                 pdf.cell(30, 4, "Grade :", 0, 0, "L")
-                pdf.cell(40, 4, str(getattr(_teacher.grade, 'grade', '')), 0, 1, "L")
+                pdf.cell(40, 4, str(getattr(_teacher.grade, "grade", "")), 0, 1, "L")
                 pdf.ln(3)
                 pdf.cell(30, 4, "Matricule :", 0, 0, "L")
                 pdf.cell(40, 4, str(_teacher.matricule or ""), 0, 1, "L")
                 pdf.ln(3)
 
                 affectations = Affectation.objects.filter(
-                    academic_year=academic,
-                    teacher=_teacher,
-                    section_id=section_id
+                    academic_year=academic, teacher=_teacher, section_id=section_id
                 )
                 if not affectations.exists():
-                    pdf.cell(0, 8, "Aucune affectation pour cet enseignant dans cette section.", 0, 1, "L")
+                    pdf.cell(
+                        0,
+                        8,
+                        "Aucune affectation pour cet enseignant dans cette section.",
+                        0,
+                        1,
+                        "L",
+                    )
                     pdf.ln(5)
                     continue
 
@@ -547,14 +620,32 @@ class ExportPdf(viewsets.ModelViewSet):
                 for aff in affectations:
                     i += 1
                     m_fees = float(aff.management_fees) if aff.management_fees else 0.0
-                    t_collected = float(aff.teacher_amount_collected) if aff.teacher_amount_collected else 0.0
+                    t_collected = (
+                        float(aff.teacher_amount_collected)
+                        if aff.teacher_amount_collected
+                        else 0.0
+                    )
                     total_management_fees += m_fees
                     total_teacher_collected += t_collected
 
                     pdf.cell(15, 8, str(i), 1, 0, "L")
                     pdf.cell(60, 8, remove_non_ascii(aff.student), 1, 0, "L")
-                    pdf.cell(30, 8, remove_non_ascii(getattr(aff.section, 'sigle', '')), 1, 0, "L")
-                    pdf.cell(30, 8, remove_non_ascii(getattr(aff.promotion, 'code', 'N/A')), 1, 0, "L")
+                    pdf.cell(
+                        30,
+                        8,
+                        remove_non_ascii(getattr(aff.section, "sigle", "")),
+                        1,
+                        0,
+                        "L",
+                    )
+                    pdf.cell(
+                        30,
+                        8,
+                        remove_non_ascii(getattr(aff.promotion, "code", "N/A")),
+                        1,
+                        0,
+                        "L",
+                    )
                     pdf.cell(30, 8, f"{m_fees:.2f}", 1, 0, "R")
                     pdf.cell(30, 8, f"{t_collected:.2f}", 1, 1, "R")
                 # Ligne des totaux
@@ -579,7 +670,9 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf_buffer.seek(0)
 
         response = HttpResponse(pdf_buffer, content_type="application/pdf")
-        response["Content-Disposition"] = f'attachment; filename="teachers_section_{section_id}_{academic.year}.pdf"'
+        response["Content-Disposition"] = (
+            f'attachment; filename="teachers_section_{section_id}_{academic.year}.pdf"'
+        )
         return response
 
     def getAllTeacherPayementSynthese(self, year):
@@ -631,7 +724,9 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf.set_fill_color(255, 255, 0)
         pdf.rect(x=rect_width, y=y_position, w=rect_width, h=rect_height, style="FD")
         pdf.set_fill_color(0, 0, 255)
-        pdf.rect(x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD")
+        pdf.rect(
+            x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD"
+        )
         pdf.ln(10)
 
         # Titre du rapport synthèse
@@ -662,7 +757,9 @@ class ExportPdf(viewsets.ModelViewSet):
                 academic_year=academic, teacher=teacher
             )
             sum_due = sum(float(aff.management_fees or 0) for aff in affectations)
-            sum_paid = sum(float(aff.teacher_amount_collected or 0) for aff in affectations)
+            sum_paid = sum(
+                float(aff.teacher_amount_collected or 0) for aff in affectations
+            )
             total_due += sum_due
             total_paid += sum_paid
 
@@ -740,16 +837,18 @@ class ExportPdf(viewsets.ModelViewSet):
             pdf.set_fill_color(255, 0, 0)
             pdf.rect(x=0, y=y_position, w=rect_width, h=rect_height, style="FD")
             pdf.set_fill_color(255, 255, 0)
-            pdf.rect(x=rect_width, y=y_position, w=rect_width, h=rect_height, style="FD")
+            pdf.rect(
+                x=rect_width, y=y_position, w=rect_width, h=rect_height, style="FD"
+            )
             pdf.set_fill_color(0, 0, 255)
-            pdf.rect(x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD")
+            pdf.rect(
+                x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD"
+            )
             pdf.ln(5)
 
             # Titre du rapport synthèse
             pdf.set_font("Arial", "B", 12)
-            pdf.cell(
-                0, 10, f"{section.name}", 0, 1, "C"
-            )
+            pdf.cell(0, 10, f"{section.name}", 0, 1, "C")
             pdf.ln(1)
             pdf.cell(
                 0, 10, "État de Paiement des Enseignants du Programme Tutoré", 0, 1, "C"
@@ -778,7 +877,9 @@ class ExportPdf(viewsets.ModelViewSet):
                     academic_year=academic, teacher=teacher, section=section
                 )
                 sum_due = sum(float(aff.management_fees or 0) for aff in affectations)
-                sum_paid = sum(float(aff.teacher_amount_collected or 0) for aff in affectations)
+                sum_paid = sum(
+                    float(aff.teacher_amount_collected or 0) for aff in affectations
+                )
 
                 if sum_due > 0:
                     total_due += sum_due
@@ -809,7 +910,7 @@ class ExportPdf(viewsets.ModelViewSet):
 
             response = HttpResponse(pdf_buffer, content_type="application/pdf")
             response["Content-Disposition"] = (
-                f'attachment; filename="synthese_paiement_enseignants_{academic.year}.pdf"'
+                f'attachment; filename="synthese_paiement_{section.name}_{academic.year}.pdf"'
             )
             return response
 
