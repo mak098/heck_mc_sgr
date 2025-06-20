@@ -214,7 +214,7 @@ class ExportPdf(viewsets.ModelViewSet):
         if not firm:
             return HttpResponse("Aucune entreprise trouvée", status=404)
 
-        pdf = CustomPDF(orientation="P")  # Mode paysage
+        pdf = CustomPDF(orientation="P")
         pdf.add_page()
 
         # Titre principal
@@ -240,7 +240,7 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf.cell(0, 10, firm.service, 0, 1, "C")
 
         # Logo sous le nom de l'entreprise avec un interligne de 10
-        pdf.ln(1)  # Interligne de 10
+        pdf.ln(1)
         logo_path = "media/" + str(firm.logo)
         if os.path.exists(logo_path):
             pdf.image(
@@ -251,55 +251,69 @@ class ExportPdf(viewsets.ModelViewSet):
                 h=25,
                 type="",
                 link="",
-            )  # Centrer le logo
+            )
         else:
             pdf.cell(0, 10, "Logo non trouvé", 0, 1, "C")
 
         # Trois barres sous le logo avec un interligne de 10
-        pdf.ln(28)  # Interligne de 10
-        rect_width = (
-            pdf.w / 3
-        )  # Largeur de chaque rectangle (1/3 de la largeur de la page)
-        rect_height = 4  # Hauteur des rectangles
-        y_position = pdf.get_y()  # Position Y après le logo et l'interligne
+        pdf.ln(28)
+        rect_width = pdf.w / 3
+        rect_height = 4
+        y_position = pdf.get_y()
 
-        # Rectangle rouge
         pdf.set_fill_color(255, 0, 0)
         pdf.rect(x=0, y=y_position, w=rect_width, h=rect_height, style="FD")
-
-        # Rectangle jaune
         pdf.set_fill_color(255, 255, 0)
         pdf.rect(x=rect_width, y=y_position, w=rect_width, h=rect_height, style="FD")
-
-        # Rectangle bleu
         pdf.set_fill_color(0, 0, 255)
         pdf.rect(
             x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD"
         )
-        pdf.ln(10)
+        pdf.ln(5)
+        pdf.cell(
+            0,
+            10,
+            "Répartition des Étudiants par Enseignant selon les Sections et Promotions",
+            0,
+            1,
+            "C",
+        )
+        pdf.ln(5)
+        # Récupérer tous les enseignants et calculer leur total général
         teachers = Teacher.objects.all()
-
+        teacher_data = []
         for teacher in teachers:
-
-            # ========== NOUVEAU TABLEAU RECAPITULATIF ==========
-            # Récupérer les données récapitulatives
             affectations = Affectation.objects.filter(
                 academic_year=academic, teacher=teacher
             )
-            summary = (
-                affectations.values(
-                    "section__sigle",
-                    "promotion__code",
-                )
-                .annotate(total=Count("id"))
-                .order_by(
-                    "section__sigle",
-                    "promotion__code",
-                )
-            )
-
-            # Calculer le total général
             total_general = affectations.count()
+            if total_general > 0:
+                teacher_data.append(
+                    {
+                        "teacher": teacher,
+                        "total_general": total_general,
+                        "affectations": affectations,
+                        "summary": (
+                            affectations.values(
+                                "section__sigle",
+                                "promotion__code",
+                            )
+                            .annotate(total=Count("id"))
+                            .order_by(
+                                "section__sigle",
+                                "promotion__code",
+                            )
+                        ),
+                    }
+                )
+
+        # Trier du plus grand au plus petit total général
+        teacher_data.sort(key=lambda x: x["total_general"], reverse=True)
+
+        for data in teacher_data:
+            teacher = data["teacher"]
+            total_general = data["total_general"]
+            summary = data["summary"]
 
             # En-tête du tableau récapitulatif
             pdf.set_font("Arial", "B", 9)
@@ -312,23 +326,21 @@ class ExportPdf(viewsets.ModelViewSet):
                 "L",
             )
 
-            pdf.set_fill_color(200, 200, 200)  # Gris clair
+            pdf.set_fill_color(200, 200, 200)
             pdf.set_text_color(0, 0, 0)
             pdf.cell(55, 8, "Section", 1, 0, "C", fill=True)
             pdf.cell(45, 8, "Promotion", 1, 0, "C", fill=True)
             pdf.cell(30, 8, "Nb Étudiants", 1, 1, "C", fill=True)
 
-            # Données du récapitulatif
             pdf.set_fill_color(255, 255, 255)
             for item in summary:
                 pdf.cell(55, 8, str(item.get("section__sigle") or ""), 1, 0, "L")
                 pdf.cell(45, 8, str(item.get("promotion__code") or ""), 1, 0, "L")
                 pdf.cell(30, 8, str(item.get("total") or ""), 1, 1, "R")
-            # Ligne du total général
-            pdf.set_fill_color(220, 220, 220)  # Gris un peu plus foncé
+
+            pdf.set_fill_color(220, 220, 220)
             pdf.cell(100, 8, "TOTAL GENERAL", 1, 0, "R", fill=True)
             pdf.cell(30, 8, str(total_general), 1, 1, "R", fill=True)
-
             pdf.ln(5)
 
         pdf.set_font("Arial", "B", 10)
@@ -789,6 +801,130 @@ class ExportPdf(viewsets.ModelViewSet):
             f'attachment; filename="synthese_paiement_enseignants_{academic.year}.pdf"'
         )
         return response
+
+    def getAllTeacherPayementSyntheseBySection(self, sections):
+        from io import BytesIO
+        from django.http import HttpResponse
+        import os
+
+        academic = AcademicYear.objects.get(is_current=True)
+
+        for sec in sections:
+            section = Section.objects.get(id=sec["id"])
+            firm = Firm.objects.all().first()
+            if not firm:
+                return HttpResponse("Aucune entreprise trouvée", status=404)
+
+            pdf = CustomPDF(orientation="P")
+            pdf.add_page()
+
+            pdf.set_font("Arial", "B", 14)
+            pdf.cell(0, 10, "Republique democratique du Congo".upper(), 0, 1, "C")
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(
+                0,
+                2,
+                "Ministère de l'Enseignement Supérieur et Universitaire".upper(),
+                0,
+                1,
+                "C",
+            )
+
+            pdf.set_text_color(0, 0, 0)
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(0, 10, firm.name, 0, 1, "C")
+
+            logo_path = "media/" + str(firm.logo)
+            if os.path.exists(logo_path):
+                pdf.image(logo_path, x=(pdf.w / 2 - 12.5), y=pdf.get_y(), w=25, h=25)
+            else:
+                pdf.cell(0, 10, "Logo non trouvé", 0, 1, "C")
+            pdf.ln(25)
+            pdf.cell(0, 10, firm.service.upper(), 0, 1, "C")
+
+            pdf.ln(1)
+            rect_width = pdf.w / 3
+            rect_height = 4
+            y_position = pdf.get_y()
+            pdf.set_fill_color(255, 0, 0)
+            pdf.rect(x=0, y=y_position, w=rect_width, h=rect_height, style="FD")
+            pdf.set_fill_color(255, 255, 0)
+            pdf.rect(
+                x=rect_width, y=y_position, w=rect_width, h=rect_height, style="FD"
+            )
+            pdf.set_fill_color(0, 0, 255)
+            pdf.rect(
+                x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD"
+            )
+            pdf.ln(5)
+
+            # Titre du rapport synthèse
+            pdf.set_font("Arial", "B", 12)
+            pdf.cell(0, 10, f"{section.name}", 0, 1, "C")
+            pdf.ln(1)
+            pdf.cell(
+                0, 10, "État de Paiement des Enseignants du Programme Tutoré", 0, 1, "C"
+            )
+            pdf.ln(5)
+
+            # En-tête du tableau
+            pdf.set_fill_color(0, 0, 0)
+            pdf.set_text_color(255, 255, 255)
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(10, 8, "N°", 1, 0, "C", fill=True)
+            pdf.cell(80, 8, "Enseignant", 1, 0, "C", fill=True)
+            pdf.cell(30, 8, "Somme Paiement", 1, 0, "C", fill=True)
+            pdf.cell(30, 8, "Perçu", 1, 0, "C", fill=True)
+            pdf.cell(30, 8, "Solde", 1, 1, "C", fill=True)
+
+            teachers = Teacher.objects.all().order_by("-grade__grade")
+            pdf.set_font("Arial", "", 10)
+            pdf.set_text_color(0, 0, 0)
+            total_due = 0.0
+            total_paid = 0.0
+            display_idx = 1
+
+            for teacher in teachers:
+                affectations = Affectation.objects.filter(
+                    academic_year=academic, teacher=teacher, section=section
+                )
+                sum_due = sum(float(aff.management_fees or 0) for aff in affectations)
+                sum_paid = sum(
+                    float(aff.teacher_amount_collected or 0) for aff in affectations
+                )
+
+                if sum_due > 0:
+                    total_due += sum_due
+                    total_paid += sum_paid
+
+                    teacher_name = f"{teacher.grade}. {teacher.first_name or ''} {teacher.last_name or ''} {teacher.name or ''}".strip()
+                    pdf.cell(10, 8, str(display_idx), 1, 0, "C")
+                    pdf.cell(80, 8, teacher_name, 1, 0, "L")
+                    pdf.cell(30, 8, f"{sum_due:.2f}", 1, 0, "R")
+                    pdf.cell(30, 8, f"{sum_paid:.2f}", 1, 0, "R")
+                    dispo = sum_due - sum_paid
+                    pdf.cell(30, 8, f"{dispo:.2f}", 1, 1, "R")
+                    display_idx += 1
+
+            # Ligne des totaux
+            pdf.set_font("Arial", "B", 10)
+            pdf.set_fill_color(230, 230, 230)
+            pdf.cell(90, 8, "TOTAL", 1, 0, "R", fill=True)
+            pdf.cell(30, 8, f"{total_due:.2f}", 1, 0, "R", fill=True)
+            pdf.cell(30, 8, f"{total_paid:.2f}", 1, 0, "R", fill=True)
+            disponible = total_due - total_paid
+            pdf.cell(30, 8, f"{disponible:.2f}", 1, 1, "R", fill=True)
+
+            # Générer le PDF
+            pdf_buffer = BytesIO()
+            pdf.output(pdf_buffer, dest="S")
+            pdf_buffer.seek(0)
+
+            response = HttpResponse(pdf_buffer, content_type="application/pdf")
+            response["Content-Disposition"] = (
+                f'attachment; filename="synthese_paiement_{section.name}_{academic.year}.pdf"'
+            )
+            return response
 
     def getAllTeacherPayementSyntheseBySection(self, sections):
         from io import BytesIO
