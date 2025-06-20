@@ -287,25 +287,25 @@ class ExportPdf(viewsets.ModelViewSet):
                 academic_year=academic, teacher=teacher
             )
             total_general = affectations.count()
-            if total_general > 0:
-                teacher_data.append(
-                    {
-                        "teacher": teacher,
-                        "total_general": total_general,
-                        "affectations": affectations,
-                        "summary": (
-                            affectations.values(
-                                "section__sigle",
-                                "promotion__code",
-                            )
-                            .annotate(total=Count("id"))
-                            .order_by(
-                                "section__sigle",
-                                "promotion__code",
-                            )
-                        ),
-                    }
-                )
+            
+            teacher_data.append(
+                {
+                    "teacher": teacher,
+                    "total_general": total_general,
+                    "affectations": affectations,
+                    "summary": (
+                        affectations.values(
+                            "section__sigle",
+                            "promotion__code",
+                        )
+                        .annotate(total=Count("id"))
+                        .order_by(
+                            "section__sigle",
+                            "promotion__code",
+                        )
+                    ),
+                }
+            )
 
         # Trier du plus grand au plus petit total général
         teacher_data.sort(key=lambda x: x["total_general"], reverse=True)
