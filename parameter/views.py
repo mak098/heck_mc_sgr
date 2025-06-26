@@ -60,7 +60,7 @@ def getAllTeacherStudentBySectionExcel(self, sections):
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-    filename = f"enseignants_par_section_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    filename = f"affectation_{section.name}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
     wb.save(response)
     return response
