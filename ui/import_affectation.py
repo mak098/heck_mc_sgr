@@ -128,7 +128,7 @@ def import_update_tuteur(request):
         old_teacher = Teacher.objects.filter(matricule=old_teacher_matricule).first()
         new_teacher_matricule = row_data.get("Nouveau Tuteur", "-")
         new_teacher = Teacher.objects.filter(matricule=new_teacher_matricule).first()
-        print(">>>>{matricule}>>>> {old_teacher_matricule} >>>>{new_teacher_matricule}")
+        print(f">>>>{matricule}>>>> {old_teacher_matricule} >>>>{new_teacher_matricule}")
         if Affectation.objects.filter(
             matricule=matricule, teacher=old_teacher, academic_year=academic_year
         ).exists():
