@@ -42,17 +42,26 @@
         <span class="menu-title">ENSEIGNANT</span>
       </a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{% url 'importation_page' %}">
-        <i class="menu-icon mdi mdi-account-convert"></i>
-        <span class="menu-title">Importation</span>
-      </a>
-    </li> 
-    <li class="nav-item">
-      <a class="nav-link payemnt" href="{% url 'importation_payement_page' %}">
-        <i class="menu-icon mdi mdi-currency-usd"></i>
-        <span class="menu-title">Payement</span>
-      </a>
-    </li> 
+    {% if user.is_authenticated %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'importation_page' %}">
+          <i class="menu-icon mdi mdi-account-convert"></i>
+          <span class="menu-title">Importation</span>
+        </a>
+      </li> 
+      <li class="nav-item">
+        <a class="nav-link payemnt" href="{% url 'importation_payement_page' %}">
+          <i class="menu-icon mdi mdi-currency-usd"></i>
+          <span class="menu-title">Payement</span>
+        </a>
+      </li> 
+      <li class="nav-item">
+        <a class="nav-link payemnt" href="{% url 'importation_update_tuteur_page' %}">
+          <i class="menu-icon mdi mdi-currency-usd"></i>
+          <span class="menu-title">Edit Tuteur</span>
+        </a>
+      </li>
+    {% endif %}
+
   </ul>
 </nav>

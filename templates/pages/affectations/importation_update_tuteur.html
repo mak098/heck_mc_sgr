@@ -1,0 +1,130 @@
+{% extends 'index.html' %} {% load static %} {% block page_content %}
+<div class="main-panel">
+  <div class="content-wrapper">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="home-tab">
+          <!-- Tab Content -->
+          <div class="col-12 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Modification</h4>
+                <p class="card-description">importation de fichier excel</p>
+                <form class="forms-sample">
+                 
+                  <div class="form-group">
+                    <label>File upload</label>
+                    <input
+                      type="file"
+                      name="file"
+                      class="file-upload-default"
+                    />
+                    <div class="input-group col-xs-12">
+                      <input
+                        type="text"
+                        class="form-control file-upload-info"
+                        disabled
+                        placeholder="Upload Excel"
+                      />
+                      <span class="input-group-append">
+                        <button
+                          class="file-upload-browse btn btn-primary"
+                          type="button"
+                        >
+                          Upload
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                 
+                  <button type="submit" class="btn btn-primary me-2">
+                    Enregistrer
+                  </button>
+                 
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- content-wrapper ends -->
+  <!-- partial:partials/_footer.html -->
+  {% include "includes/footer.html" %}
+  <!-- partial -->
+</div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const uploadButton = document.querySelector('.file-upload-browse');
+    const fileInput = document.querySelector('input[type="file"]');
+    const fileNameDisplay = document.querySelector('.file-upload-info');
+    const submitButton = document.querySelector('form button[type="submit"]');
+
+    // Met à jour le champ texte avec le nom du fichier sélectionné
+    uploadButton.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', () => {
+      const fileName = fileInput.files[0]?.name || '';
+      fileNameDisplay.value = fileName;
+    });
+
+    // Gestion de l'envoi du formulaire
+    submitButton.addEventListener('click', function (e) {
+      e.preventDefault();
+
+      const formData = new FormData();
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert('Veuillez sélectionner un fichier Excel.');
+        return;
+      }
+
+      formData.append('file', file);
+
+      fetch('/import_update_tuteur/', {  // 🔁 adapte l’URL à celle de ta vue
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken')  // Important pour Django
+        },
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message) {
+            alert(data.message);
+          }
+          if (data.errors && data.errors.length > 0) {
+            console.error("Erreurs:", data.errors);
+            alert("Certaines affectations ont échoué. Voir la console pour plus de détails.");
+          }
+        })
+        .catch((error) => {
+          console.error('Erreur lors de l’envoi:', error);
+          alert('Erreur lors de l’envoi du fichier.');
+        });
+    });
+
+    // Récupération du CSRF token (Django)
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === name + '=') {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+  });
+</script>
+
+
+{% endblock page_content%}

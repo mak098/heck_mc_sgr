@@ -41,6 +41,11 @@ urlpatterns = [
         affectations.importation_payement_page,
         name="importation_payement_page",
     ),
+    path(
+        "importation_update_tuteur_page",
+        affectations.importation_update_tuteur_page,
+        name="importation_update_tuteur_page",
+    ),
     path("get-students/", affectations.get_students, name="get_students"),
     path(
         "get_students_by_teacher/",
@@ -82,5 +87,10 @@ urlpatterns = [
         "import_payement/",
         import_affectation.import_payement,
         name="import_payement",
+    ),
+    path(
+        "import_update_tuteur/",
+        import_affectation.import_update_tuteur,
+        name="import_update_tuteur",
     ),
 ]

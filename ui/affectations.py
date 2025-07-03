@@ -104,6 +104,37 @@ def importation_payement_page(request):
             "students": students,
         },
     )
+def importation_update_tuteur_page(request):
+    current_url = request.resolver_match.view_name
+    year = request.GET.get("year")
+
+    if not year:
+        academic = AcademicYear.objects.get(is_current=True)
+    else:
+        academic = AcademicYear.objects.get(year=year)
+
+    filiere_with_student_count = Filiere.objects.filter(
+        student_orientation_set__academic_year=academic  # Traversée de relation correcte
+    ).annotate(student_count=Count("student_orientation_set", distinct=True))
+
+    sections = Section.objects.all()
+    teachers = Teacher.objects.all()
+    promotions = Promotion.objects.all()
+    students = Student.objects.all()
+    academic_years = AcademicYear.objects.filter().order_by("-created_at")
+
+    return render(
+        request,
+        "pages/affectations/importation_update_tuteur.html",
+        {
+            "filieres": filiere_with_student_count,
+            "academics": academic_years,
+            "sections": sections,
+            "teachers": teachers,
+            "promotions": promotions,
+            "students": students,
+        },
+    )
 
 
 def get_students(request):
