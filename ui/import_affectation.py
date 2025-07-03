@@ -113,14 +113,18 @@ def import_update_tuteur(request):
 
     workbook = openpyxl.load_workbook(excel_file)
     sheet = workbook.active
+    # headers = [
+    #     (cell.value.strip().lower() if cell.value is not None else "") for cell in sheet[1]
+    # ]
     headers = [
-        (cell.value.strip().lower() if cell.value is not None else "") for cell in sheet[1]
+        (cell.value.strip().lower() if cell.value is not None else "")
+        for cell in sheet[1]
     ]
     success_count = 0
     errors = []
 
     for row in sheet.iter_rows(min_row=2, values_only=True):
-       
+
         row_data = dict(zip(headers, row))
         academic_year = AcademicYear.objects.get(is_current=True)
         matricule = row_data.get("Matricule Etudiant", "-")
