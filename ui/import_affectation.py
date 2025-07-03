@@ -120,7 +120,7 @@ def import_update_tuteur(request):
     errors = []
 
     for row in sheet.iter_rows(min_row=2, values_only=True):
-        print(">>>>>>>>>>>>>>>>>>>>>>>>update tuteur")
+       
         row_data = dict(zip(headers, row))
         academic_year = AcademicYear.objects.get(is_current=True)
         matricule = row_data.get("Matricule Etudiant", "-")
@@ -128,6 +128,7 @@ def import_update_tuteur(request):
         old_teacher = Teacher.objects.filter(matricule=old_teacher_matricule).first()
         new_teacher_matricule = row_data.get("Nouveau Tuteur", "-")
         new_teacher = Teacher.objects.filter(matricule=new_teacher_matricule).first()
+        print(">>>>{matricule}>>>> {old_teacher_matricule} >>>>{new_teacher_matricule}")
         if Affectation.objects.filter(
             matricule=matricule, teacher=old_teacher, academic_year=academic_year
         ).exists():
