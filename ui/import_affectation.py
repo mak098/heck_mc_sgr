@@ -103,8 +103,8 @@ def import_payement(request):
         status=status.HTTP_200_OK,
     )
 
-
 def import_update_tuteur(request):
+
     excel_file = request.FILES.get("file")
     if not excel_file:
         return JsonResponse(
@@ -114,44 +114,33 @@ def import_update_tuteur(request):
     workbook = openpyxl.load_workbook(excel_file)
     sheet = workbook.active
     headers = [
-        (cell.value.strip().lower() if cell.value is not None else "")
-        for cell in sheet[1]
+        (cell.value.strip().lower() if cell.value is not None else "") for cell in sheet[1]
     ]
     success_count = 0
     errors = []
 
-    for idx, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
-        try:
-            row_data = dict(zip(headers, row))
-            academic_year = AcademicYear.objects.get(is_current=True)
-            matricule = row_data.get("matricule etudiant", "-")
-            old_teacher_matricule = row_data.get("matricule enseignant", "-")
-            old_teacher = Teacher.objects.filter(
-                matricule=old_teacher_matricule
-            ).first()
-            new_teacher_matricule = row_data.get("Nouveau Tuteur", "-")
-            new_teacher = Teacher.objects.filter(
-                matricule=new_teacher_matricule
-            ).first()
-
-            if not old_teacher or not new_teacher:
-                raise ValueError("Enseignant introuvable")
-
+    for row in sheet.iter_rows(min_row=2, values_only=True):
+        row_data = dict(zip(headers, row))
+        academic_year = AcademicYear.objects.get(is_current=True)
+        matricule = row_data.get("Matricule Etudiant", "-")
+        old_teacher_matricule = row_data.get("Matricule Enseignant", "-")
+        old_teacher = Teacher.objects.filter(matricule=old_teacher_matricule).first()
+        new_teacher_matricule = row_data.get("Nouveau Tuteur", "-")
+        new_teacher = Teacher.objects.filter(matricule=new_teacher_matricule).first()
+        if Affectation.objects.filter(
+            matricule=matricule, teacher=old_teacher, academic_year=academic_year
+        ).exists():
             affectation = Affectation.objects.filter(
                 matricule=matricule, teacher=old_teacher, academic_year=academic_year
             ).first()
-            if not affectation:
-                raise ValueError("Affectation introuvable")
 
             affectation.teacher = new_teacher
             affectation.save()
             success_count += 1
-        except Exception as e:
-            errors.append(f"Ligne {idx}: {str(e)}")
 
     return JsonResponse(
         {
-            "message": f"{success_count} affectations modifiées avec succès.",
+            "message": f"{success_count} affectations modifier avec succès.",
             "errors": errors,
         },
         status=status.HTTP_200_OK,
