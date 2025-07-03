@@ -126,6 +126,7 @@ def import_update_tuteur(request):
     for row in sheet.iter_rows(min_row=2, values_only=True):
 
         row_data = dict(zip(headers, row))
+        print(row_data)  # Pour voir le contenu de chaque ligne
         academic_year = AcademicYear.objects.get(is_current=True)
         matricule = row_data.get("Matricule Etudiant", "-")
         old_teacher_matricule = row_data.get("Matricule Enseignant", "-")
