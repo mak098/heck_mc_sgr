@@ -133,7 +133,9 @@ def import_update_tuteur(request):
             affectation = Affectation.objects.filter(
                 matricule=matricule, teacher=old_teacher, academic_year=academic_year
             ).first()
-
+            print(
+                f">>>>>>>>>>>>>>>>>>>>>>>>teacher {affectation.matricule}",
+            )
             affectation.teacher = new_teacher
             affectation.save()
             success_count += 1
