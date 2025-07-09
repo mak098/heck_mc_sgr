@@ -7,7 +7,8 @@ from . import affectations
 from . import teacher
 from . import import_affectation
 urlpatterns = [
-    path("", views.index, name="dash"),
+    path("", teacher.teacher_page, name="dash"),
+    # path("", views.index, name="dash"),
     path("tab-dash/", views.get_academic_data, name="tab-dash"),
     path(
         "update-promotion/<int:promotion>",
