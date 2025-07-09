@@ -4,7 +4,7 @@
       <div class="card-body">
         <form class="forms-group">
           <div class="form-group">
-            <label>Selectionner un enseignant</label>
+            <label>Entrez le nom ou le matricule de l'enseignant pour voir les étudiants affectés.</label>
             <select class="js-example-basic-single w-100 teacher-choice">
               {% for teacher in teachers %}
               <option value="{{ teacher.id }}">{{teacher.full_name }}</option>

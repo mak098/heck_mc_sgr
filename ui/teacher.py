@@ -58,6 +58,7 @@ def get_students_by_teacher(request):
             .select_related("student")
             .values(
                 "id",
+                "matricule",
                 "student",
                 "promotion__code",  # suppose que promotion est un modèle lié
                 "section__sigle",  # suppose que orientation est un modèle lié
@@ -65,7 +66,7 @@ def get_students_by_teacher(request):
                 "teacher_amount_collected",
             )
         )
-       
+
         return JsonResponse({"affectations": list(affectations)})
     except (Teacher.DoesNotExist, AcademicYear.DoesNotExist):
         return JsonResponse({"affectations": []})

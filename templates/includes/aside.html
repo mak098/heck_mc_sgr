@@ -1,14 +1,20 @@
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
   <ul class="nav">
-    <li class="nav-item">
+    {% comment %} <li class="nav-item">
       <a class="nav-link" href="{% url 'dash' %}">
         <i class="mdi mdi-grid-large menu-icon"></i>
         <span class="menu-title">Dashboard</span>
       </a>
+    </li> {% endcomment %}
+    <li class="nav-item">
+      <a class="nav-link"  href="{% url 'teacher-page' %}">
+        <i class="mdi mdi-grid-large menu-icon"></i>
+        <span class="menu-title">ENSEIGNANT</span>
+      </a>
     </li>
     <li class="nav-item nav-category">Menus</li>
  
-    <li class="nav-item">
+    {% comment %} <li class="nav-item">
       <a
         class="nav-link"
         data-bs-toggle="collapse"
@@ -33,15 +39,15 @@
           {% endfor %}
         </ul>
       </div>
-    </li>
+    </li> {% endcomment %}
 
 
-    <li class="nav-item">
+    {% comment %} <li class="nav-item">
       <a class="nav-link" href="{% url 'teacher-page' %}">
         <i class="menu-icon mdi mdi-account-edit"></i>
         <span class="menu-title">ENSEIGNANT</span>
       </a>
-    </li>
+    </li> {% endcomment %}
     {% if user.is_authenticated %}
       <li class="nav-item">
         <a class="nav-link" href="{% url 'importation_page' %}">
