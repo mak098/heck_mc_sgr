@@ -15,6 +15,8 @@ from affectation.models import Affectation
 from django.db.models import Count
 import asyncio
 from parameter.models import Section
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment, PatternFill
 
 
 class CustomPDF(FPDF):
@@ -287,7 +289,7 @@ class ExportPdf(viewsets.ModelViewSet):
                 academic_year=academic, teacher=teacher
             )
             total_general = affectations.count()
-            
+
             teacher_data.append(
                 {
                     "teacher": teacher,
@@ -1047,6 +1049,134 @@ class ExportPdf(viewsets.ModelViewSet):
             response = HttpResponse(pdf_buffer, content_type="application/pdf")
             response["Content-Disposition"] = (
                 f'attachment; filename="synthese_paiement_{section.name}_{academic.year}.pdf"'
+            )
+            return response
+
+    def getAllTeacherPayementSyntheseBySectionExcel(self, sections):
+        from django.http import HttpResponse
+
+        academic = AcademicYear.objects.get(is_current=True)
+
+        for sec in sections:
+            section = Section.objects.get(id=sec["id"])
+            firm = Firm.objects.all().first()
+            if not firm:
+                return HttpResponse("Aucune entreprise trouvée", status=404)
+
+            wb = Workbook()
+            ws = wb.active
+            ws.title = f"Synthèse Paiement {section.name}"
+
+            # Entête
+            ws.merge_cells("A1:E1")
+            ws["A1"] = "Republique democratique du Congo".upper()
+            ws["A1"].font = Font(bold=True, size=14)
+            ws["A1"].alignment = Alignment(horizontal="center")
+
+            ws.merge_cells("A2:E2")
+            ws["A2"] = "Ministère de l'Enseignement Supérieur et Universitaire".upper()
+            ws["A2"].font = Font(bold=True, size=10, color="0000FF")
+            ws["A2"].alignment = Alignment(horizontal="center")
+
+            ws.merge_cells("A3:E3")
+            ws["A3"] = firm.name
+            ws["A3"].font = Font(bold=True, size=10)
+            ws["A3"].alignment = Alignment(horizontal="center")
+
+            ws.merge_cells("A4:E4")
+            ws["A4"] = firm.service.upper()
+            ws["A4"].font = Font(bold=True, size=10)
+            ws["A4"].alignment = Alignment(horizontal="center")
+
+            ws.merge_cells("A5:E5")
+            ws["A5"] = f"{section.name}"
+            ws["A5"].font = Font(bold=True, size=12)
+            ws["A5"].alignment = Alignment(horizontal="center")
+
+            ws.merge_cells("A6:E6")
+            ws["A6"] = "État de Paiement des Enseignants du Programme Tutoré"
+            ws["A6"].font = Font(bold=True, size=12)
+            ws["A6"].alignment = Alignment(horizontal="center")
+
+            # En-tête du tableau
+            headers = ["N°", "Enseignant", "Somme Paiement", "Perçu", "Solde"]
+            ws.append(headers)
+            for col in range(1, 6):
+                ws.cell(row=7, column=col).font = Font(bold=True, color="FFFFFF")
+                ws.cell(row=7, column=col).fill = PatternFill("solid", fgColor="000000")
+                ws.cell(row=7, column=col).alignment = Alignment(horizontal="center")
+
+            teachers = Teacher.objects.all().order_by("-grade__grade")
+            total_due = 0.0
+            total_paid = 0.0
+            display_idx = 1
+            row_idx = 8
+
+            for teacher in teachers:
+                affectations = Affectation.objects.filter(
+                    academic_year=academic, teacher=teacher, section=section
+                )
+                sum_due = sum(float(aff.management_fees or 0) for aff in affectations)
+                sum_paid = sum(
+                    float(aff.teacher_amount_collected or 0) for aff in affectations
+                )
+
+                if sum_due > 0:
+                    total_due += sum_due
+                    total_paid += sum_paid
+
+                    teacher_name = f"{teacher.grade}. {teacher.first_name or ''} {teacher.last_name or ''} {teacher.name or ''}".strip()
+                    ws.append(
+                        [
+                            display_idx,
+                            teacher_name,
+                            f"{sum_due:.2f}",
+                            f"{sum_paid:.2f}",
+                            f"{sum_due - sum_paid:.2f}",
+                        ]
+                    )
+                    row_idx += 1
+                    display_idx += 1
+
+            # Ligne des totaux
+            ws.append(
+                [
+                    "TOTAL",
+                    "",
+                    f"{total_due:.2f}",
+                    f"{total_paid:.2f}",
+                    f"{total_due - total_paid:.2f}",
+                ]
+            )
+            for col in range(1, 6):
+                ws.cell(row=row_idx, column=col).font = Font(bold=True)
+                ws.cell(row=row_idx, column=col).fill = PatternFill(
+                    "solid", fgColor="E6E6E6"
+                )
+                ws.cell(row=row_idx, column=col).alignment = Alignment(
+                    horizontal="center" if col == 1 else "right"
+                )
+
+            # Ajuster la largeur des colonnes
+            ws.column_dimensions["A"].width = 6
+            ws.column_dimensions["B"].width = 35
+            ws.column_dimensions["C"].width = 18
+            ws.column_dimensions["D"].width = 18
+            ws.column_dimensions["E"].width = 18
+
+            # Générer le fichier Excel
+            from io import BytesIO
+
+            output = BytesIO()
+            wb.save(output)
+            output.seek(0)
+
+            response = HttpResponse(
+                output,
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
+            response["Content-Disposition"] = (
+                f'attachment; filename="synthese_paiement_{section.name}_{academic.year}.xlsx"'
             )
             return response
 

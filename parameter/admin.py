@@ -4,17 +4,20 @@ from ui.rapportTeacherPdf import ExportPdf
 from .views import getAllTeacherStudentBySectionExcel
 
 
-
-
 def download_affection(modeladmin, request, queryset):
     return ExportPdf.getAllTeacherStudentBySection(request, queryset.values())
 def download_affection_sythese(modeladmin, request, queryset):
     return ExportPdf.getAllTeacherPayementSyntheseBySection(request, queryset.values())
+def download_affection_sythese_excel(modeladmin, request, queryset):
+    return ExportPdf.getAllTeacherPayementSyntheseBySectionExcel(
+        request, queryset.values()
+    )
 def download_affection_excel(modeladmin, request, queryset):
     return getAllTeacherStudentBySectionExcel(request, queryset.values())
 
 download_affection.short_description = "telecharger les etudiant actuel"
 download_affection_sythese.short_description = "telecharger synthese paiement"
+download_affection_sythese_excel.short_description = "telecharger synthese paiement excel"
 download_affection_excel.short_description = "telecharger les etudiant actuel en excel"
 class FiliereInline(admin.TabularInline):
     extra = 0
@@ -56,7 +59,12 @@ class SectionAdmin(admin.ModelAdmin):
     fields = [ "name", "sigle"]
     search_fields = ["name", "sigle"]
     inlines = [FiliereInline,]
-    actions = [download_affection,download_affection_sythese,download_affection_excel]  
+    actions = [
+        download_affection,
+        download_affection_sythese,
+        download_affection_sythese_excel,
+        download_affection_excel,
+    ]
 
 @admin.register(Filiere)
 class FiliereAdmin(admin.ModelAdmin):
