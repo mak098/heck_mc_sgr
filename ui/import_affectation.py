@@ -15,10 +15,13 @@ def import_excel_file(request):
             {"error": "Aucun fichier fourni."}, status=status.HTTP_400_BAD_REQUEST
         )
 
-    # try:
     workbook = openpyxl.load_workbook(excel_file)
     sheet = workbook.active
-    headers = [cell.value.strip().lower() for cell in sheet[1]]
+    # Handle None values in header cells
+    headers = [
+        (cell.value.strip().lower() if cell.value is not None else "")
+        for cell in sheet[1]
+    ]
     success_count = 0
     errors = []
 
