@@ -101,7 +101,9 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf.cell(
             40,
             4,
-            f"{_teacher.first_name} {_teacher.last_name} {_teacher.name}",
+            remove_non_ascii(
+                f"{_teacher.first_name} {_teacher.last_name} {_teacher.name}"
+            ),
             0,
             1,
             "L",
@@ -130,8 +132,8 @@ class ExportPdf(viewsets.ModelViewSet):
         for item in summary:
             section_sigle = item["section__sigle"] or "N/A"
             promotion_code = item["promotion__code"] or "N/A"
-            pdf.cell(55, 8, section_sigle, 1, 0, "L")
-            pdf.cell(45, 8, promotion_code, 1, 0, "L")
+            pdf.cell(55, 8, remove_non_ascii(section_sigle), 1, 0, "L")
+            pdf.cell(45, 8, remove_non_ascii(promotion_code), 1, 0, "L")
             pdf.cell(30, 8, str(item["total"]), 1, 1, "L")
 
         pdf.set_fill_color(220, 220, 220)
@@ -170,9 +172,16 @@ class ExportPdf(viewsets.ModelViewSet):
             total_teacher_collected += t_collected
 
             pdf.cell(15, 8, str(i), 1, 0, "L")
-            pdf.cell(60, 8, aff.student, 1, 0, "L")
-            pdf.cell(30, 8, aff.section.sigle, 1, 0, "L")
-            pdf.cell(30, 8, aff.promotion.code if aff.promotion else "N/A", 1, 0, "L")
+            pdf.cell(60, 8, remove_non_ascii(aff.student), 1, 0, "L")
+            pdf.cell(30, 8, remove_non_ascii(aff.section.sigle), 1, 0, "L")
+            pdf.cell(
+                30,
+                8,
+                remove_non_ascii(aff.promotion.code if aff.promotion else "N/A"),
+                1,
+                0,
+                "L",
+            )
             pdf.cell(30, 8, f"{m_fees:.2f}", 1, 0, "R")
             pdf.cell(30, 8, f"{t_collected:.2f}", 1, 1, "R")
 
@@ -198,7 +207,7 @@ class ExportPdf(viewsets.ModelViewSet):
 
         response = HttpResponse(pdf_buffer, content_type="application/pdf")
         response["Content-Disposition"] = (
-            f'attachment; filename="{_teacher.first_name}.pdf"'
+            f'attachment; filename="{remove_non_ascii(_teacher.first_name)}.pdf"'
         )
         return response
 
