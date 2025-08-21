@@ -14,7 +14,7 @@ class AffectionAdmin(admin.ModelAdmin):
         "management_fees",
         "deposit_fees",
         "teacher_amount_collected",
-        "section_sigle",
+        # "section_sigle",
         "academic_year",
     ]
     search_fields = ["teacher__matricule", "teacher__name","student","matricule"]
@@ -33,9 +33,9 @@ class AffectionAdmin(admin.ModelAdmin):
         "created_at",
     ]
 
-    def section_sigle(self, obj):
-        return obj.section.sigle
-    section_sigle.short_description = "Section"
+    # def section_sigle(self, obj):
+    #     return obj.section.sigle
+    # section_sigle.short_description = "Section"
 
 @admin.register(Prevision)
 class PrevisionAdmin(admin.ModelAdmin):
