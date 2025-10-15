@@ -18,6 +18,9 @@ from parameter.models import Section
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 
+from ui import affectations
+from django.db.models import Sum
+
 
 class CustomPDF(FPDF):
     def footer(self):
@@ -45,7 +48,7 @@ class ExportPdf(viewsets.ModelViewSet):
         if not firm:
             return HttpResponse("Aucune entreprise trouvée", status=404)
 
-        pdf = CustomPDF(orientation="P")
+        pdf = CustomPDF(orientation="L")
         pdf.add_page()
 
         pdf.set_font("Arial", "B", 14)
@@ -88,7 +91,7 @@ class ExportPdf(viewsets.ModelViewSet):
 
         # Titre du rapport synthèse
         pdf.set_font("Arial", "B", 12)
-       
+
         pdf.cell(0, 10, "Répartition des frais de dépôt du projet tutoré 1", 0, 1, "C")
         pdf.ln(5)
         pdf.set_fill_color(0, 0, 0)
@@ -98,36 +101,76 @@ class ExportPdf(viewsets.ModelViewSet):
         pdf.cell(80, 8, "SECTION", 1, 0, "C", fill=True)
         pdf.cell(30, 8, "Somme Dépôt", 1, 0, "C", fill=True)
         pdf.cell(30, 8, "Perçu", 1, 0, "C", fill=True)
-        pdf.cell(30, 8, "ETS(30%)", 1, 1, "C", fill=True)
-        pdf.cell(30, 8, "SGR(20%)", 1, 1, "C", fill=True)
+        pdf.cell(30, 8, "Dispo", 1, 0, "C", fill=True)
+        pdf.cell(30, 8, "ETS(30%)", 1, 0, "C", fill=True)
+        pdf.cell(30, 8, "SGR(20%)", 1, 0, "C", fill=True)
         pdf.cell(30, 8, "SECTION(50%)", 1, 1, "C", fill=True)
-
+        i = 0
+        sum_total_deposit_fees = 0
+        sum_total_deposit_fees_collected = 0
+        sum_diff = 0
+        sum_ets = 0
+        sum_sgr = 0
+        sum_section = 0
         for sec in sections:
+            i += 1
             section = Section.objects.get(id=sec["id"])
-
-            # En-tête du tableau
-            pdf.set_fill_color(0, 0, 0)
-            pdf.set_text_color(255, 255, 255)
-            pdf.set_font("Arial", "B", 10)
-            pdf.cell(10, 8, "N°", 1, 0, "C", fill=True)
-            pdf.cell(80, 8, "Enseignant", 1, 0, "C", fill=True)
-            pdf.cell(30, 8, "Somme Dépôt", 1, 0, "C", fill=True)
-            pdf.cell(30, 8, "Perçu", 1, 0, "C", fill=True)
-            pdf.cell(30, 8, "Solde", 1, 1, "C", fill=True)
-
             affectations = Affectation.objects.filter(
                 academic_year=academic, section=section
             )
-            # Générer le PDF
-            pdf_buffer = BytesIO()
-            pdf.output(pdf_buffer, dest="S")
-            pdf_buffer.seek(0)
-
-            response = HttpResponse(pdf_buffer, content_type="application/pdf")
-            response["Content-Disposition"] = (
-                f'attachment; filename="synthese_depot_{section.name}_{academic.year}.pdf"'
+            total_deposit_fees = (
+                affectations.aggregate(total=Sum("deposit_fees"))["total"] or 0
             )
-            return response
+            total_deposit_fees_collected = (
+                affectations.aggregate(total=Sum("teacher_deposit_amount_collected"))[
+                    "total"
+                ]
+                or 0
+            )
+            diff = total_deposit_fees - total_deposit_fees_collected
+            ets = diff * 0.30
+            sgr = diff * 0.20
+            section_part = diff * 0.50
+
+            sum_total_deposit_fees += total_deposit_fees
+            sum_total_deposit_fees_collected += total_deposit_fees_collected
+            sum_diff += diff
+            sum_ets += ets
+            sum_sgr += sgr
+            sum_section += section_part
+
+            pdf.set_fill_color(255, 255, 255)
+            pdf.set_text_color(0, 0, 0)
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(10, 8, str(i), 1, 0, "C", fill=True)
+            pdf.cell(80, 8, sec["sigle"], 1, 0, "C", fill=True)
+            pdf.cell(30, 8, str(total_deposit_fees), 1, 0, "C", fill=True)
+            pdf.cell(30, 8, str(total_deposit_fees_collected), 1, 0, "C", fill=True)
+            pdf.cell(30, 8, str(diff), 1, 0, "C", fill=True)
+            pdf.cell(30, 8, str(ets), 1, 0, "C", fill=True)
+            pdf.cell(30, 8, str(sgr), 1, 0, "C", fill=True)
+            pdf.cell(30, 8, str(section_part), 1, 1, "C", fill=True)
+
+        # Ligne TOTAL
+        pdf.set_fill_color(230, 230, 230)
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_font("Arial", "B", 10)
+        pdf.cell(90, 8, "TOTAL", 1, 0, "C", fill=True)
+        pdf.cell(30, 8, str(sum_total_deposit_fees), 1, 0, "C", fill=True)
+        pdf.cell(30, 8, str(sum_total_deposit_fees_collected), 1, 0, "C", fill=True)
+        pdf.cell(30, 8, str(sum_diff), 1, 0, "C", fill=True)
+        pdf.cell(30, 8, str(sum_ets), 1, 0, "C", fill=True)
+        pdf.cell(30, 8, str(sum_sgr), 1, 0, "C", fill=True)
+        pdf.cell(30, 8, str(sum_section), 1, 1, "C", fill=True)
+        pdf_buffer = BytesIO()
+        pdf.output(pdf_buffer, dest="S")
+        pdf_buffer.seek(0)
+
+        response = HttpResponse(pdf_buffer, content_type="application/pdf")
+        response["Content-Disposition"] = (
+            f'attachment; filename="synthese_depot_{section.name}_{academic.year}.pdf"'
+        )
+        return response
 
     def getTeacherStudent(self, year, teacher):
         try:
