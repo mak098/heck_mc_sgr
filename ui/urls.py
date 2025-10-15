@@ -90,6 +90,11 @@ urlpatterns = [
         name="import_payement",
     ),
     path(
+        "import_payement_deposit_fees/",
+        import_affectation.import_payement_deposit_fees,
+        name="import_payement_deposit_fees",
+    ),
+    path(
         "import_update_tuteur/",
         import_affectation.import_update_tuteur,
         name="import_update_tuteur",
