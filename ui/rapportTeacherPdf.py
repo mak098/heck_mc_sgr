@@ -122,7 +122,7 @@ class ExportPdf(viewsets.ModelViewSet):
                 )
                 sum_due = sum(float(aff.deposit_fees or 0) for aff in affectations)
                 sum_paid = sum(
-                    float(aff.teacher_amount_collected or 0) for aff in affectations
+                    float(aff.teacher_deposit_amount_collected or 0) for aff in affectations
                 )
 
                 if sum_due > 0:
