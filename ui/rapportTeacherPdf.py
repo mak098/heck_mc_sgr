@@ -88,8 +88,7 @@ class ExportPdf(viewsets.ModelViewSet):
 
         # Titre du rapport synthèse
         pdf.set_font("Arial", "B", 12)
-        pdf.cell(0, 10, f"{section.name}", 0, 1, "C")
-        pdf.ln(1)
+       
         pdf.cell(0, 10, "Répartition des frais de dépôt du projet tutoré 1", 0, 1, "C")
         pdf.ln(5)
         pdf.set_fill_color(0, 0, 0)
