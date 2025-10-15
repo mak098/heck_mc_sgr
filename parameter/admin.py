@@ -1,9 +1,16 @@
 from django.contrib import admin
 from .models import AcademicYear, Section,Filiere, DocumentFolde, Promotion, Firm, Speciality
 from ui.rapportTeacherPdf import ExportPdf
-from .views import getAllTeacherStudentBySectionExcel
+from .views import (
+    getAllTeacherStudentBySectionExcel,
+    
+)
 
 
+def download_deposity_fees(modeladmin, request, queryset):
+    return ExportPdf.getAllTeacherPayementDepositSyntheseBySection(
+        request, queryset.values()
+    )
 def download_affection(modeladmin, request, queryset):
     return ExportPdf.getAllTeacherStudentBySection(request, queryset.values())
 def download_affection_sythese(modeladmin, request, queryset):
@@ -15,6 +22,7 @@ def download_affection_sythese_excel(modeladmin, request, queryset):
 def download_affection_excel(modeladmin, request, queryset):
     return getAllTeacherStudentBySectionExcel(request, queryset.values())
 
+download_deposity_fees.short_description = "telecharger frais de depot"
 download_affection.short_description = "telecharger les etudiant actuel"
 download_affection_sythese.short_description = "telecharger synthese paiement"
 download_affection_sythese_excel.short_description = "telecharger synthese paiement excel"
@@ -64,6 +72,7 @@ class SectionAdmin(admin.ModelAdmin):
         download_affection_sythese,
         download_affection_sythese_excel,
         download_affection_excel,
+        download_deposity_fees,
     ]
 
 @admin.register(Filiere)

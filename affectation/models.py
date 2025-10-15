@@ -80,7 +80,11 @@ class Affectation(models.Model):
     teacher_amount_collected = models.FloatField(
         default=0.00, verbose_name="Percu par l'enseignant"
     )
+    teacher_deposit_amount_collected = models.FloatField(
+        default=0.00, verbose_name="Percu par l'enseignant"
+    )
     date_teacher_amount_collected = models.DateTimeField(null=True,blank=True,verbose_name="Date perception de l'enseignant")
+    date_teacher_deposit_amount_collected = models.DateTimeField(null=True,blank=True,verbose_name="Date perception de l'enseignant")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)     
 
