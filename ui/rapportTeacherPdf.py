@@ -40,134 +40,85 @@ class ExportPdf(viewsets.ModelViewSet):
         import os
 
         academic = AcademicYear.objects.get(is_current=True)
+
         firm = Firm.objects.all().first()
         if not firm:
             return HttpResponse("Aucune entreprise trouvée", status=404)
 
+        pdf = CustomPDF(orientation="P")
+        pdf.add_page()
+
+        pdf.set_font("Arial", "B", 14)
+        pdf.cell(0, 10, "Republique democratique du Congo".upper(), 0, 1, "C")
+        pdf.set_font("Arial", "B", 10)
+        pdf.cell(
+            0,
+            2,
+            "Ministère de l'Enseignement Supérieur et Universitaire".upper(),
+            0,
+            1,
+            "C",
+        )
+
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_font("Arial", "B", 10)
+        pdf.cell(0, 10, firm.name, 0, 1, "C")
+
+        logo_path = "media/" + str(firm.logo)
+        if os.path.exists(logo_path):
+            pdf.image(logo_path, x=(pdf.w / 2 - 12.5), y=pdf.get_y(), w=25, h=25)
+        else:
+            pdf.cell(0, 10, "Logo non trouvé", 0, 1, "C")
+        pdf.ln(25)
+        pdf.cell(0, 10, firm.service.upper(), 0, 1, "C")
+
+        pdf.ln(1)
+        rect_width = pdf.w / 3
+        rect_height = 4
+        y_position = pdf.get_y()
+        pdf.set_fill_color(255, 0, 0)
+        pdf.rect(x=0, y=y_position, w=rect_width, h=rect_height, style="FD")
+        pdf.set_fill_color(255, 255, 0)
+        pdf.rect(x=rect_width, y=y_position, w=rect_width, h=rect_height, style="FD")
+        pdf.set_fill_color(0, 0, 255)
+        pdf.rect(
+            x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD"
+        )
+        pdf.ln(5)
+
+        # Titre du rapport synthèse
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 10, f"{section.name}", 0, 1, "C")
+        pdf.ln(1)
+        pdf.cell(0, 10, "Répartition des frais de dépôt du projet tutoré 1", 0, 1, "C")
+        pdf.ln(5)
+        pdf.set_fill_color(0, 0, 0)
+        pdf.set_text_color(255, 255, 255)
+        pdf.set_font("Arial", "B", 10)
+        pdf.cell(10, 8, "N°", 1, 0, "C", fill=True)
+        pdf.cell(80, 8, "SECTION", 1, 0, "C", fill=True)
+        pdf.cell(30, 8, "Somme Dépôt", 1, 0, "C", fill=True)
+        pdf.cell(30, 8, "Perçu", 1, 0, "C", fill=True)
+        pdf.cell(30, 8, "ETS(30%)", 1, 1, "C", fill=True)
+        pdf.cell(30, 8, "SGR(20%)", 1, 1, "C", fill=True)
+        pdf.cell(30, 8, "SECTION(50%)", 1, 1, "C", fill=True)
+
         for sec in sections:
             section = Section.objects.get(id=sec["id"])
 
-            pdf = CustomPDF(orientation="P")
-            pdf.add_page()
-
-            pdf.set_font("Arial", "B", 14)
-            pdf.cell(0, 10, "Republique democratique du Congo".upper(), 0, 1, "C")
-            pdf.set_font("Arial", "B", 10)
-            pdf.cell(
-                0,
-                2,
-                "Ministère de l'Enseignement Supérieur et Universitaire".upper(),
-                0,
-                1,
-                "C",
-            )
-
-            pdf.set_text_color(0, 0, 0)
-            pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 10, firm.name, 0, 1, "C")
-
-            logo_path = "media/" + str(firm.logo)
-            if os.path.exists(logo_path):
-                pdf.image(logo_path, x=(pdf.w / 2 - 12.5), y=pdf.get_y(), w=25, h=25)
-            else:
-                pdf.cell(0, 10, "Logo non trouvé", 0, 1, "C")
-            pdf.ln(25)
-            pdf.cell(0, 10, firm.service.upper(), 0, 1, "C")
-
-            pdf.ln(1)
-            rect_width = pdf.w / 3
-            rect_height = 4
-            y_position = pdf.get_y()
-            pdf.set_fill_color(255, 0, 0)
-            pdf.rect(x=0, y=y_position, w=rect_width, h=rect_height, style="FD")
-            pdf.set_fill_color(255, 255, 0)
-            pdf.rect(
-                x=rect_width, y=y_position, w=rect_width, h=rect_height, style="FD"
-            )
-            pdf.set_fill_color(0, 0, 255)
-            pdf.rect(
-                x=rect_width * 2, y=y_position, w=rect_width, h=rect_height, style="FD"
-            )
-            pdf.ln(5)
-
-            # Titre du rapport synthèse
-            pdf.set_font("Arial", "B", 12)
-            pdf.cell(0, 10, f"{section.name}", 0, 1, "C")
-            pdf.ln(1)
-            pdf.cell(
-                0, 10, "Répartition des frais de dépôt du projet tutoré 1", 0, 1, "C"
-            )
-            pdf.ln(5)
+            # En-tête du tableau
             pdf.set_fill_color(0, 0, 0)
             pdf.set_text_color(255, 255, 255)
             pdf.set_font("Arial", "B", 10)
             pdf.cell(10, 8, "N°", 1, 0, "C", fill=True)
-            pdf.cell(50, 8, "Enseignant", 1, 0, "C", fill=True)
+            pdf.cell(80, 8, "Enseignant", 1, 0, "C", fill=True)
             pdf.cell(30, 8, "Somme Dépôt", 1, 0, "C", fill=True)
             pdf.cell(30, 8, "Perçu", 1, 0, "C", fill=True)
-            pdf.cell(30, 8, "Solde", 1, 0, "C", fill=True)
-            pdf.cell(25, 8, "ETS(30%)", 1, 0, "C", fill=True)
-            pdf.cell(25, 8, "SGR(20%)", 1, 0, "C", fill=True)
-            pdf.cell(30, 8, "SECTION(50%)", 1, 1, "C", fill=True)
+            pdf.cell(30, 8, "Solde", 1, 1, "C", fill=True)
 
-            teachers = (
-                Teacher.objects.filter(
-                    affectations_teacher_set__section=section,
-                    affectations_teacher_set__academic_year=academic,
-                )
-                .distinct()
-                .order_by("-grade__grade")
+            affectations = Affectation.objects.filter(
+                academic_year=academic, section=section
             )
-            total_due = 0.0
-            total_paid = 0.0
-            total_ets = 0.0
-            total_sgr = 0.0
-            total_section = 0.0
-            display_idx = 1
-
-            for teacher in teachers:
-                affectations = Affectation.objects.filter(
-                    academic_year=academic, teacher=teacher, section=section
-                )
-                sum_due = sum(float(aff.deposit_fees or 0) for aff in affectations)
-                sum_paid = sum(
-                    float(aff.teacher_deposit_amount_collected or 0)
-                    for aff in affectations
-                )
-                solde = sum_due - sum_paid
-                ets = solde * 0.3
-                sgr = solde * 0.2
-                section_part = solde * 0.5
-
-                if sum_due > 0 or sum_paid > 0:
-                    total_due += sum_due
-                    total_paid += sum_paid
-                    total_ets += ets
-                    total_sgr += sgr
-                    total_section += section_part
-
-                    teacher_name = f"{teacher.grade}. {teacher.first_name or ''} {teacher.last_name or ''} {teacher.name or ''}".strip()
-                    pdf.cell(10, 8, str(display_idx), 1, 0, "C")
-                    pdf.cell(50, 8, teacher_name, 1, 0, "L")
-                    pdf.cell(30, 8, f"{sum_due:.2f}", 1, 0, "R")
-                    pdf.cell(30, 8, f"{sum_paid:.2f}", 1, 0, "R")
-                    pdf.cell(30, 8, f"{solde:.2f}", 1, 0, "R")
-                    pdf.cell(25, 8, f"{ets:.2f}", 1, 0, "R")
-                    pdf.cell(25, 8, f"{sgr:.2f}", 1, 0, "R")
-                    pdf.cell(30, 8, f"{section_part:.2f}", 1, 1, "R")
-                    display_idx += 1
-
-            # Ligne des totaux
-            pdf.set_font("Arial", "B", 10)
-            pdf.set_fill_color(230, 230, 230)
-            pdf.cell(60, 8, "TOTAL", 1, 0, "R", fill=True)
-            pdf.cell(30, 8, f"{total_due:.2f}", 1, 0, "R", fill=True)
-            pdf.cell(30, 8, f"{total_paid:.2f}", 1, 0, "R", fill=True)
-            pdf.cell(30, 8, f"{total_due-total_paid:.2f}", 1, 0, "R", fill=True)
-            pdf.cell(25, 8, f"{total_ets:.2f}", 1, 0, "R", fill=True)
-            pdf.cell(25, 8, f"{total_sgr:.2f}", 1, 0, "R", fill=True)
-            pdf.cell(30, 8, f"{total_section:.2f}", 1, 1, "R", fill=True)
-
             # Générer le PDF
             pdf_buffer = BytesIO()
             pdf.output(pdf_buffer, dest="S")
@@ -292,7 +243,7 @@ class ExportPdf(viewsets.ModelViewSet):
 
         pdf.set_fill_color(0, 0, 0)
         pdf.set_text_color(255, 255, 255)
-        pdf.set_font("Arial", "B", 9)
+        pdf.cell(0, 10, "Synthèse des Dépôts par Section", 0, 1, "C")
         pdf.cell(15, 8, "Num", 1, 0, "C", fill=True)
         pdf.cell(60, 8, "Noms", 1, 0, "C", fill=True)
         pdf.cell(30, 8, "Section", 1, 0, "C", fill=True)
