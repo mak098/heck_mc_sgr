@@ -29,6 +29,7 @@ def getAllTeacherStudentBySectionExcel(self, sections):
         "Promotion",
         "Nom Etudiant",
         "Matricule Etudiant",
+        "Frais projet tutoré",
     ]
     ws.append(headers)
     for cell in ws[3]:
@@ -53,6 +54,7 @@ def getAllTeacherStudentBySectionExcel(self, sections):
                         getattr(aff.promotion, "code", ""),
                         aff.student,
                         aff.matricule,  # Si tu veux le nombre d'étudiants, adapte ici selon ta logique
+                        aff.management_fees,  # Si tu veux le nombre d'étudiants, adapte ici selon ta logique
                     ]
                 )
 
