@@ -30,6 +30,9 @@ def getAllTeacherStudentBySectionExcel(self, sections):
         "Nom Etudiant",
         "Matricule Etudiant",
         "Frais projet tutoré",
+        "Frais dépôt",
+        "Date retrait projet tutoré",
+        "Date retrait dépôt",
     ]
     ws.append(headers)
     for cell in ws[3]:
@@ -55,6 +58,9 @@ def getAllTeacherStudentBySectionExcel(self, sections):
                         aff.student,
                         aff.matricule,  # Si tu veux le nombre d'étudiants, adapte ici selon ta logique
                         aff.management_fees,  # Si tu veux le nombre d'étudiants, adapte ici selon ta logique
+                        aff.deposit_fees,  # Si tu veux le nombre d'étudiants, adapte ici selon ta logique
+                        aff.date_teacher_amount_collected().strftime("%Y-%m-%d") if aff.date_teacher_amount_collected else "",
+                        aff.date_teacher_deposit_amount_collected().strftime("%Y-%m-%d") if aff.date_teacher_deposit_amount_collected else ""
                     ]
                 )
 
