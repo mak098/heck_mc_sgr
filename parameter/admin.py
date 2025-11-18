@@ -3,8 +3,12 @@ from .models import AcademicYear, Section,Filiere, DocumentFolde, Promotion, Fir
 from ui.rapportTeacherPdf import ExportPdf
 from .views import (
     getAllTeacherStudentBySectionExcel,
-    
+    downloadStudentsByAcademicYearExcel,
 )
+
+
+def download_students_by_academic_year(modeladmin, request, queryset):
+    return downloadStudentsByAcademicYearExcel(request, queryset.values())
 
 
 def download_deposity_fees(modeladmin, request, queryset):
@@ -27,6 +31,11 @@ download_affection.short_description = "telecharger les etudiant actuel"
 download_affection_sythese.short_description = "telecharger synthese paiement"
 download_affection_sythese_excel.short_description = "telecharger synthese paiement excel"
 download_affection_excel.short_description = "telecharger les etudiant actuel en excel"
+download_students_by_academic_year.short_description = (
+    "telecharger les etudiants par annee academique"
+)
+
+
 class FiliereInline(admin.TabularInline):
     extra = 0
     model = Filiere
@@ -51,7 +60,8 @@ class AcademicYearAdmin(admin.ModelAdmin):
     list_display = ["year", "is_current"]
     fields = ["year", "is_current"]
     search_fields = ["year"]
-    
+    actions = [download_students_by_academic_year]
+
     def save_model(self, request, obj, form, change):
         obj.created_by = request.user
         obj.save()
